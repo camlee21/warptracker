@@ -11,7 +11,10 @@ func dblLinkGroup(_ warpGraph: inout WarpGraph, _ array: [String]) {
     for i in 0..<array.count {
         for j in 0..<array.count {
             if i != j {
-                warpGraph.addDoubleLink(between: array[i], and: array[j])
+                let result = warpGraph.addDoubleLink(between: array[i], and: array[j])
+                if !result {
+                    print("Failed to link: \(array[i]) <-> \(array[j])")
+                }
             }
         }
     }
@@ -33,34 +36,33 @@ struct WarpGraph: Codable, Hashable {
         guard warps[warp1ID] != nil,
               warps[warp2ID] != nil,
               !checkLink(from: warp1ID, to: warp2ID) else { return false }
-        warps[warp1ID]?.addLink(warp2ID)
+        warps[warp1ID]!.addLink(warp2ID)
         return true
     }
-    
+
     mutating func removeSingleLink(from warp1ID: String, to warp2ID: String) {
         guard warps[warp1ID] != nil,
               warps[warp2ID] != nil,
               checkLink(from: warp1ID, to: warp2ID) else { return }
-        warps[warp1ID]?.removeLink(warp2ID)
+        warps[warp1ID]!.removeLink(warp2ID)
     }
-    
+
     mutating func addDoubleLink(between warp1ID: String, and warp2ID: String) -> Bool {
         guard warps[warp1ID] != nil,
               warps[warp2ID] != nil,
-              !checkLink(from: warp1ID, to: warp2ID),
-              !checkLink(from: warp2ID, to: warp1ID) else { return false }
-        warps[warp1ID]?.addLink(warp2ID)
-        warps[warp2ID]?.addLink(warp1ID)
+              !checkLink(from: warp1ID, to: warp2ID) else { return false }
+        warps[warp1ID]!.addLink(warp2ID)
+        warps[warp2ID]!.addLink(warp1ID)
         return true
     }
-    
+
     mutating func removeDoubleLink(between warp1ID: String, and warp2ID: String) {
         guard warps[warp1ID] != nil,
               warps[warp2ID] != nil,
               checkLink(from: warp1ID, to: warp2ID),
               checkLink(from: warp2ID, to: warp1ID) else { return }
-        warps[warp1ID]?.removeLink(warp2ID)
-        warps[warp2ID]?.removeLink(warp1ID)
+        warps[warp1ID]!.removeLink(warp2ID)
+        warps[warp2ID]!.removeLink(warp1ID)
     }
     
     // MARK: - Link Checking
@@ -152,30 +154,30 @@ extension WarpGraph {
             for line in lines {
                 let trimmed = line.trimmingCharacters(in: .whitespaces)
                 if trimmed.hasPrefix("--") {
-                    if !items.isEmpty {
+                    if items.count > 1 {
                         dblLinkGroup(&self, items)
-                        items = []
                     }
+                    items = []
                 } else if !trimmed.isEmpty {
                     items.append(trimmed)
                 }
             }
-            if !items.isEmpty {
+            if items.count > 1 {
                 dblLinkGroup(&self, items)
             }
         }
         
         // Reading in and linking all double links
-        if let doubleLinksURL = Bundle.main.url(forResource: "all_double_links", withExtension: "txt"),
-           let doubleLinksContent = try? String(contentsOf: doubleLinksURL) {
-            let lines = doubleLinksContent.components(separatedBy: .newlines).filter { !$0.isEmpty }
-            for line in lines {
-                let parts = line.components(separatedBy: ", ")
-                if parts.count >= 2 {
-                    addDoubleLink(between: parts[0], and: parts[1])
-                }
-            }
-        }
+//        if let doubleLinksURL = Bundle.main.url(forResource: "all_double_links", withExtension: "txt"),
+//           let doubleLinksContent = try? String(contentsOf: doubleLinksURL) {
+//            let lines = doubleLinksContent.components(separatedBy: .newlines).filter { !$0.isEmpty }
+//            for line in lines {
+//                let parts = line.components(separatedBy: ", ")
+//                if parts.count >= 2 {
+//                    addDoubleLink(between: parts[0], and: parts[1])
+//                }
+//            }
+//        }
         
         // Reading in and linking all single links
         if let singleLinksURL = Bundle.main.url(forResource: "all_single_links", withExtension: "txt"),

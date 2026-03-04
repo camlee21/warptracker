@@ -1,0 +1,442 @@
+-- All warps within dashes are doubly linked with each other --
+-- Sandgem + Jubilife + Routes --
+Verity_Lake_Entrance
+Sandgem_Centre_Entrance
+Sandgem_Mart_Entrance
+Sandgem_House_Left
+Sandgem_House_Right
+Jubilife_House_Bottom
+Jubilife_Centre_Entrance
+Jubilife_Mart_Entrance
+Jubilife_Condo
+Jubilife_TV_Entrance
+Jubilife_Poketch_Left
+Jubilife_Poketch_Right
+Jublife_Gate_West
+Route_204_Cave_South
+Route_203_Cave
+-- Sandgem PC --
+Sandgem_Centre_Exit
+Sandgem_Centre_Left
+Sandgem_Centre_Right
+-- Jubilife PC --
+Jubilife_Centre_Exit
+Jubilife_Centre_Left
+Jubilife_Centre_Right
+-- Oreburgh --
+Oreburgh_Cave_West
+Oreburgh_Centre_Entrance
+Oreburgh_Mart_Entrance
+Oreburgh_House_Middle
+Oreburgh_Gym_House
+Oreburgh_Mine_Entrance
+Oreburgh_Mine_House
+Oreburgh_Museum_Entrance
+Oreburgh_Museum_House
+Oreburgh_Condo_Left
+Oreburgh_Condo_Right
+-- Oreburgh PC --
+Oreburgh_Centre_Exit
+Oreburgh_Centre_Left
+Oreburgh_Centre_Right
+-- Floaroma + Route 204 --
+Floaroma_Centre_Entrance
+Floaroma_Mart_Entrance
+Floaroma_Meadow_Entrance
+Floaroma_Flower_Shop
+Floaroma_House_North
+Floaroma_House_South
+Route_204_Cave_North
+-- Floaroma PC --
+Floaroma_Centre_Exit
+Floaroma_Centre_Left
+Floaroma_Centre_Right
+-- Eterna --
+Eterna_Centre_Entrance
+Eterna_Mart_Entrance
+Eterna_Gym_Entrance
+Eterna_Gate_South
+Eterna_Condo_Entrance
+Eterna_Bike_Shop
+Eterna_House_North
+Eterna_House_South
+Eterna_House_East
+Route_205_Forest_Exit
+Route_211_Cave_West
+-- Eterna PC --
+Eterna_Centre_Exit
+Eterna_Centre_Left
+Eterna_Centre_Right
+-- Hearthome--
+Hearthome_Centre_Entrance
+Hearthome_Mart_Entrance
+Hearthome_Gate_West
+Hearthome_Gate_South
+Hearthome_Temple_Entrance
+Hearthome_Amity_Left
+Hearthome_Amity_Right
+Hearthome_Contest_Entrance
+Hearthome_Condo_North
+Hearthome_Condo_South
+Hearthome_House_Bebe
+Hearthome_Poffin_House
+Hearthome_Fan_Club
+-- Hearthome PC --
+Hearthome_Centre_Exit
+Hearthome_Centre_Left
+Hearthome_Centre_Right
+-- Solaceon + Route 209/210/215--
+Solaceon_Centre_Entrance
+Solaceon_Mart_Entrance
+Solaceon_Daycare_Entrance
+Solaceon_Ruins_Entrance
+Solaceon_Tree_House_1
+Solaceon_Tree_House_2
+Solaceon_News_House
+Solaceon_House_North
+Route_209_Gate
+Route_209_Tower
+Route_210_Milk
+Route_215_Gate
+-- Solaceon PC --
+Solaceon_Centre_Exit
+Solaceon_Centre_Left
+Solaceon_Centre_Right
+-- Veilstone --
+Veilstone_Centre_Entrance
+Veilstone_Dept_Store
+Veilstone_Warehouse_Entrance
+Veilstone_GHQ_Door_1
+Veilstone_GHQ_Door_2
+Veilstone_GHQ_Door_3
+Veilstone_Gate_West
+Veilstone_Gate_South
+Veilstone_Game_Corner
+Veilstone_Corner_Redeem
+Veilstone_PC_House_1
+Veilstone_PC_House_2
+Veilstone_Gym_Entrance
+Veilstone_Gym_House_1
+Veilstone_Gym_House_2
+-- Veilstone PC --
+Veilstone_Centre_Exit
+Veilstone_Centre_Left
+Veilstone_Centre_Right
+-- Pastoria + Route 212 --
+Pastoria_Centre_Entrance
+Pastoria_Mart_Entrance
+Pastoria_Gym_Entrance
+Pastoria_Gate_East
+Pastoria_Gate_House
+Pastoria_Gym_House
+Pastoria_House_Left
+Pastoria_House_Right
+Pastoria_House_South
+Route_212_House
+Backlot_Mansion_Entrance
+Route_212_Gate
+-- Pastoria PC --
+Pastoria_Centre_Exit
+Pastoria_Centre_Left
+Pastoria_Centre_Right
+-- Celestic + Route 211 --
+Celestic_Centre_Entrance
+Celestic_House_Left
+Celestic_House_Right
+Celestic_House_South
+Celestic_Hall_North
+Celestic_Ruins_Entrance
+Route_211_Cave_East
+-- Celestic PC --
+Celestic_Centre_Exit
+Celestic_Centre_Left
+Celestic_Centre_Right
+-- Canalave + Iron Island --
+Canalave_Centre_Entrance
+Canalave_Mart_Entrance
+Canalave_Library_Entrance
+Canalave_Gym_Entrance
+Canalave_Gate_East
+Canalave_Locked_House
+Canalave_House_Top_Left
+Canalave_House_Bottom_Left
+Canalave_House_Top_Right
+Canalave_House_Bottom_Right
+Iron_Island_House
+Iron_Island_Entrance
+-- Canalave PC --
+Canalave_Centre_Exit
+Canalave_Centre_Left
+Canalave_Centre_Right
+-- Snowpoint + Route 216/217 --
+Snowpoint_Centre_Entrance
+Snowpoint_Mart_Entrance
+Snowpoint_Gym_Entrance
+Snowpoint_House_Left
+Snowpoint_House_Right
+Snowpoint_Temple_Entrance
+Route_217_House_Top
+Route_217_House_Bottom
+Route_216_House
+Route_216_Cave_Exit
+-- Snowpoint PC --
+Snowpoint_Centre_Exit
+Snowpoint_Centre_Left
+Snowpoint_Centre_Right
+-- Sunyshore --
+Sunyshore_Centre_Entrance
+Sunyshore_Mart_Entrance
+Sunyshore_Seal_Shop
+Sunyshore_Lighthouse_Entrance
+Sunyshore_Gate_South
+Sunyshore_Mart_House
+Sunyshore_House_Left
+Sunyshore_House_Right
+-- Sunyshore PC --
+Sunyshore_Centre_Exit
+Sunyshore_Centre_Left
+Sunyshore_Centre_Right
+-- Valor Lakefront + Surrounding Routes --
+Valor_House_Bottom
+Valor_House_Bottom_Left
+Valor_House_Bottom_Right
+Valor_Cafe_Entrance
+Valor_House_West
+Valor_House_North
+Valor_Lake_Entrance
+Route_222_House_Left
+Route_222_House_Right
+Route_222_Gate
+Route_214_Cave_Entrance
+Route_214_Gate_North
+-- Backlot Mansion --
+Backlot_Mansion_Left_1
+Backlot_Mansion_Left_2
+Backlot_Mansion_Left_3
+Backlot_Mansion_Right
+Backlot_Mansion_Top
+Backlot_Mansion_Bottom
+-- Dept Store --
+Dept_Store_B1F
+Dept_Store_1F_Exit
+Dept_Store_1F_Down
+Dept_Store_1F_Up
+Dept_Store_2F_Down
+Dept_Store_2F_Up
+Dept_Store_3F_Down
+Dept_Store_3F_Up
+Dept_Store_4F_Down
+Dept_Store_4F_Up
+Dept_Store_5F_Down
+-- Jubilife TV --
+Jubilife_TV_1F_Exit
+Jubilife_TV_1F_Up
+Jubilife_TV_2F_Down
+Jubilife_TV_2F_Up
+Jubilife_TV_2F_Door
+Jubilife_TV_3F_Down
+Jubilife_TV_3F_Up
+Jubilife_TV_3F_Door_Left
+Jubilife_TV_3F_Door_Right
+Jubilife_TV_4F_Down
+-- Eterna Forest --
+Eterna_Forest_Exit_South
+Eterna_Forest_Exit_North
+-- Fight Area --
+Fight_Area_Centre_Entrance
+Fight_Area_Mart_Entrance
+Fight_Area_House_Top
+Fight_Area_House_Bottom
+Fight_Area_Frontier_Entrance
+Fight_Area_Gate_North
+-- Fight Area PC --
+Fight_Area_Centre_Exit
+Fight_Area_Centre_Left
+Fight_Area_Centre_Right
+-- Resort Area + Route 228 --
+Resort_Area_Centre_Entrance
+Resort_Area_House
+Resort_Area_Ribbons
+Resort_Area_Villa
+Route_228_House_Top
+Route_228_Gate_North
+-- Resort Area PC --
+Resort_Area_Centre_Exit
+Resort_Area_Centre_Left
+Resort_Area_Centre_Right
+-- Jubilife GTS --
+Jubilife_GTS_Warp_Red
+Jubilife_GTS_Warp_Green
+Jubilife_GTS_Exit
+-- Old Chateau Room --
+Old_Chateau_Room_Top
+Old_Chateau_Room_Left
+Old_Chateau_Room_Right
+Old_Chateau_Room_Bottom
+Old_Chateau_Room_Exit
+-- Old Chateau Corridor --
+Old_Chateau_Corridor_Exit
+Old_Chateau_Corridor_Middle
+Old_Chateau_Corridor_Left_1
+Old_Chateau_Corridor_Left_2
+Old_Chateau_Corridor_Right_1
+Old_Chateau_Corridor_Right_2
+-- Floaroma Meadow --
+Floaroma_Meadow_Exit_South
+Floaroma_Meadow_House
+-- Poketch Company --
+Poketch_Company_Exit_Left
+Poketch_Company_Exit_Right
+Poketch_Company_Stairs
+-- TG Eterna 1F --
+TG_Eterna_1F_Exit
+TG_Eterna_1F_Rotom_Room
+TG_Eterna_1F_Stairs_Left
+TG_Eterna_1F_Stairs_Right
+-- TG Eterna 2F --
+TG_Eterna_2F_Down
+TG_Eterna_2F_Up_Left
+TG_Eterna_2F_Up_Right
+-- TG Eterna 3F --
+TG_Eterna_3F_Down
+TG_Eterna_3F_Up_Left
+TG_Eterna_3F_Up_Right
+-- Oreburgh Gate --
+Oreburgh_Gate_Exit_Left
+Oreburgh_Gate_Exit_Right
+-- Solaceon Ruins 1F --
+Solaceon_Ruins_1F_Exit
+Solaceon_Ruins_1F_Bottom_Right
+Solaceon_Ruins_1F_Top_Left
+Solaceon_Ruins_1F_Top_Right
+-- Solaceon Ruins B1F -- (has hiker)
+Solaceon_Ruins_B1F_Bottom_Left
+Solaceon_Ruins_B1F_Bottom_Right
+Solaceon_Ruins_B1F_Top_Left
+Solaceon_Ruins_B1F_Top_Right
+-- Solaceon Ruins B2F -- (has other nerd)
+Solaceon_Ruins_B2F_Bottom_Left
+Solaceon_Ruins_B2F_Bottom_Right
+Solaceon_Ruins_B2F_Top_Left
+Solaceon_Ruins_B2F_Top_Right
+-- Solaceon Ruins B3F/1 -- (has 3 down 1 up)
+Solaceon_Ruins_B3F_1_Bottom_Left
+Solaceon_Ruins_B3F_1_Bottom_Right
+Solaceon_Ruins_B3F_1_Top_Left
+Solaceon_Ruins_B3F_1_Top_Right
+-- Solaceon Ruins B3F/2 -- (has 2 down 1 up)
+Solaceon_Ruins_B3F_2_Bottom_Left
+Solaceon_Ruins_B3F_2_Bottom_Right
+Solaceon_Ruins_B3F_2_Top_Left
+-- Solaceon Ruins B4F -- (has 1 down 3 up)
+Solaceon_Ruins_B4F_Bottom_Left
+Solaceon_Ruins_B4F_Bottom_Right
+Solaceon_Ruins_B4F_Top_Left
+Solaceon_Ruins_B4F_Top_Right
+-- Galactic HQ Lobby --
+GHQ_Lobby_Exit_Left
+GHQ_Lobby_Exit_Right
+-- Galactic HQ Big Floor --
+GHQ_Big_Floor_Stairs
+GHQ_Big_Floor_Warp_TV
+GHQ_Big_Floor_Warp_Top
+GHQ_Big_Floor_Warp_Bottom
+-- GHQ Basement --
+GHQ_Basement_Stairs_Left
+GHQ_Basement_Stairs_Right
+-- GHQ 3 Warp Room --
+GHQ_Warp_Room_Stairs
+GHQ_Warp_Room_Warp_Right
+GHQ_Warp_Room_Warp_Middle
+GHQ_Warp_Room_Warp_Left
+-- GHQ 2 Stairs 1 Warp Room --
+GHQ_Stairs_Room_Stairs_Up
+GHQ_Stairs_Room_Stairs_Down
+GHQ_Stairs_Room_Warp
+-- GHQ Stairs + 2 Warp Room --
+GHQ_Two_Warp_Left
+GHQ_Two_Warp_Right
+GHQ_Two_Warp_Stairs
+-- GHQ Cyrus Room --
+GHQ_Cyrus_Warp_Green
+GHQ_Cyrus_Warp_Top_Right
+GHQ_Cyrus_Warp_Room
+-- Mt Coronet Cyrus Room --
+Coronet_Cyrus_Exit_Left
+Coronet_Cyrus_Exit_Right
+-- Mt Coronet Looker Room --
+Coronet_Looker_Room_Exit_East
+Coronet_Looker_Room_Exit_North
+-- Coronet Stairs and Exit Room --
+Coronet_Stairs_Left
+Coronet_Stairs_Right
+Coronet_Stairs_Cave_Exit
+-- Coronet Two Caves and Stairs Room --
+Coronet_Two_Caves_Exit
+Coronet_Two_Caves_Middle
+Coronet_Two_Caves_Stairs
+-- Coronet Peak Top --
+Coronet_Peak_Top_Bottom_Cave
+Coronet_Peak_Top_Middle_Cave
+-- Coronet Peak Bottom --
+Coronet_Peak_Bottom_Right_Cave
+Coronet_Peak_Bottom_Left_Cave
+-- Outside League PC --
+League_Centre_Small_Entrance
+Victory_Road_Entrance
+-- Pokemon League PC Small --
+League_Centre_Small_Exit
+League_Centre_Small_Left
+League_Centre_Small_Right
+-- Pokemon League PC Big --
+League_Centre_Big_Exit
+League_Centre_Big_E4
+League_Centre_Big_Up
+League_Centre_Big_Down
+-- Route 226/227 --
+Route_227_House
+Route_226_Gate
+-- Route 205 --
+Eterna_Forest_Entrance
+Route_205_House
+-- Route 206 --
+Route_206_Cave_Entrance
+Route_206_Hidden_Cave_Entrance
+-- Route 206/207 --
+Bicycle_Road_Entrance
+Route_207_Cave
+-- Route 208 --
+Route_208_Cave
+Route_208_House
+Route_208_Gate
+-- Route 213 --
+Route_213_Gate
+Route_213_Foot_Freak
+Route_213_Door
+-- Route 221 --
+Route_221_House
+Route_221_Pal_Park
+-- Survival Area + Route 225 --
+Survival_Area_Centre_Entrance
+Survival_Area_Mart_Entrance
+Survival_Area_House
+Survival_Area_Battleground
+-- Iron Island First Room --
+Iron_Island_Room_1_Exit
+Iron_Island_Room_1_Left
+Iron_Island_Room_1_Right
+-- Iron Island Room with Trainer --
+Iron_Island_Room_2_Up
+Iron_Island_Room_2_Left
+Iron_Island_Room_2_Right
+-- Iron Island Cave Room --
+Iron_Island_Room_3_Cave
+Iron_Island_Room_2_Exit_Left
+Iron_Island_Room_2_Exit_Right
+-- Jubilife GTS and House --
+Jubilife_GTS_Entrance
+Jubilife_GTS_House
+-- Victory Road Main --
+Victory_Road_Main_Cave
+Victory_Road_Main_Stairs_Left_Top
+-- END OF FILE --

@@ -72,26 +72,43 @@ struct Save: Codable, Hashable {
         self.graph = graph
         self.flags = starting_flags
         self.available = [
-            "Verity_Lake_Entrance",
-            "Sandgem_Centre_Entrance",
-            "Sandgem_Mart_Entrance",
-            "Sandgem_House_Left",
-            "Sandgem_House_Right",
-            "Jubilife_House_Bottom",
-            "Jubilife_Centre_Entrance",
-            "Jubilife_Mart_Entrance",
-            "Jubilife_Condo",
-            "Jubilife_TV_Entrance",
-            "Jubilife_Poketch_Left",
-            "Jubilife_Poketch_Right",
-            "Jublife_Gate_West",
-            "Route_204_Cave_South",
+//            "Verity_Lake_Entrance",
+//            "Sandgem_Centre_Entrance",
+//            "Sandgem_Mart_Entrance",
+//            "Sandgem_House_Left",
+//            "Sandgem_House_Right",
+//            "Jubilife_House_Bottom",
+//            "Jubilife_Centre_Entrance",
+//            "Jubilife_Mart_Entrance",
+//            "Jubilife_Condo",
+//            "Jubilife_TV_Entrance",
+//            "Jubilife_Poketch_Left",
+//            "Jubilife_Poketch_Right",
+//            "Jublife_Gate_West",
+//            "Route_204_Cave_South",
             "Route_203_Cave"
         ]
     }
     
     mutating func changeFlag(flagID: String) {
         self.flags[flagID]?.toggle()
+    }
+    
+    mutating func expandAvailable() {
+        var changed = true
+        while changed {
+            changed = false
+            for warpID in available {
+                if let neighbours = graph.warps[warpID]?.neighbours {
+                    for neighbour in neighbours {
+                        if !available.contains(neighbour) {
+                            available.append(neighbour)
+                            changed = true
+                        }
+                    }
+                }
+            }
+        }
     }
     
     mutating func reloadFlags() {
@@ -120,5 +137,8 @@ struct Save: Codable, Hashable {
         if self.flags["GOT_WATERFALL"] == true && self.flags["DEFEATED_GYM_8"] == true {
             self.traversalFlags["CAN_WATERFALL"] = true
         }
+        
+        // update available warps
+        expandAvailable()
     }
 }
