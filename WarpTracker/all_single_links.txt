@@ -1,0 +1,7 @@
+Floaroma_Meadow_Exit_North, Floaroma_Meadow_Exit_South
+Floaroma_Meadow_Exit_North, Floaroma_Meadow_House
+Iron_Island_Gated_Exit, Iron_Island_Entrance
+Iron_Island_Gated_Exit, Iron_Island_House
+Fight_Area_Centre_Entrance, Snowpoint_Centre_Entrance
+Route_207_Cave, Oreburgh_Centre_Entrance
+Victory_Road_Main_Stairs_Right_Top, Victory_Road_Main_Stairs_Right_Middle
