@@ -15,6 +15,8 @@ struct SaveView: View {
     @State var showFlags: Bool = false
     @State var showHMs: Bool = false
     @State var showTrainers: Bool = false
+    @State var showMapMenu: Bool = false
+    @State var selectedLocation: String? = "Sandgem"
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -26,7 +28,12 @@ struct SaveView: View {
         _MainSaveFile = State(initialValue: loaded)
         self.onDisappear = onDisappear
     }
-    
+
+    var uniqueLocations: [String] {
+        let locations = MainSaveFile.graph.warps.values.map { $0.location }
+        return Array(Set(locations)).sorted()
+    }
+
     func formatFlagID(_ flagID: String) -> String {
         let parts = flagID.components(separatedBy: "_")
         switch parts.first {
@@ -45,70 +52,130 @@ struct SaveView: View {
             return parts.map { $0.capitalized }.joined(separator: " ")
         }
     }
-    
+
     var body: some View {
         ZStack {
-            HStack(spacing: 0) {
-                VStack(spacing: 12) {
+
+            // Background map image
+            if let location = selectedLocation {
+                MapView(locationID: location)
+                    .ignoresSafeArea()
+            }
+
+            // Top right warp counter
+            VStack {
+                HStack {
                     Spacer()
-                    
-                    if showFlags {
-                        flagPanel(keys: ["GOT_WORKS_KEY", "GOT_GALACTIC_KEY", "GOT_BIKE", "GOT_SECRET_POTION",
-                                         "SEEN_ROARK", "SEEN_FANTINA", "SEEN_VOLKNER", "DEFEATED_MARS_WINDWORKS"])
-                    }
-                    if showHMs {
-                        flagPanel(keys: ["GOT_ROCK_SMASH", "GOT_CUT", "GOT_FLY", "GOT_DEFOG",
-                                         "GOT_SURF", "GOT_STRENGTH", "GOT_ROCK_CLIMB", "GOT_WATERFALL", "GOT_TELEPORT"])
-                    }
-                    if showTrainers {
-                        flagPanel(keys: ["DEFEATED_GYM_1", "DEFEATED_GYM_2", "DEFEATED_GYM_3", "DEFEATED_GYM_4",
-                                         "DEFEATED_GYM_5", "DEFEATED_GYM_6", "DEFEATED_GYM_7", "DEFEATED_GYM_8",
-                                         "DEFEATED_AARON", "DEFEATED_BERTHA", "DEFEATED_FLINT", "DEFEATED_LUCIAN", "DEFEATED_CYNTHIA"])
-                    }
-                    
-                    let anyOpen = showFlags || showHMs || showTrainers
-                    
-                    if anyOpen {
-                        HStack(spacing: 8) {
-                            sideButton(icon: showFlags ? "flag.fill" : "flag", isActive: showFlags) {
-                                showFlags.toggle()
-                                showHMs = false
-                                showTrainers = false
-                            }
-                            sideButton(icon: showHMs ? "opticaldisc.fill" : "opticaldisc", isActive: showHMs) {
-                                showHMs.toggle()
-                                showFlags = false
-                                showTrainers = false
-                            }
-                            sideButton(icon: showTrainers ? "person.fill" : "person", isActive: showTrainers) {
-                                showTrainers.toggle()
-                                showFlags = false
-                                showHMs = false
-                            }
-                        }
-                    } else {
-                        VStack(spacing: 8) {
-                            sideButton(icon: "flag", isActive: false) {
-                                showFlags = true
-                            }
-                            sideButton(icon: "opticaldisc", isActive: false) {
-                                showHMs = true
-                            }
-                            sideButton(icon: "person", isActive: false) {
-                                showTrainers = true
-                            }
-                        }
-                    }
-                    
-                    Spacer()
+                    Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                        .padding(.top, 8)
+                        .padding(.trailing, 16)
                 }
-                .padding(.leading, 16)
-                
                 Spacer()
+            }
+
+            // Bottom bar
+            VStack {
+                Spacer()
+
+                // Panels above the bottom bar
+                HStack(alignment: .bottom) {
+
+                    // Left panels
+                    VStack(alignment: .leading, spacing: 8) {
+                        if showFlags {
+                            flagPanel(keys: ["GOT_WORKS_KEY", "GOT_GALACTIC_KEY", "GOT_BIKE", "GOT_SECRET_POTION",
+                                             "SEEN_ROARK", "SEEN_FANTINA", "SEEN_VOLKNER", "DEFEATED_MARS_WINDWORKS"])
+                        }
+                        if showHMs {
+                            flagPanel(keys: ["GOT_ROCK_SMASH", "GOT_CUT", "GOT_FLY", "GOT_DEFOG",
+                                             "GOT_SURF", "GOT_STRENGTH", "GOT_ROCK_CLIMB", "GOT_WATERFALL", "GOT_TELEPORT"])
+                        }
+                        if showTrainers {
+                            flagPanel(keys: ["DEFEATED_GYM_1", "DEFEATED_GYM_2", "DEFEATED_GYM_3", "DEFEATED_GYM_4",
+                                             "DEFEATED_GYM_5", "DEFEATED_GYM_6", "DEFEATED_GYM_7", "DEFEATED_GYM_8",
+                                             "DEFEATED_AARON", "DEFEATED_BERTHA", "DEFEATED_FLINT", "DEFEATED_LUCIAN", "DEFEATED_CYNTHIA"])
+                        }
+                    }
+                    .padding(.leading, 16)
+
+                    Spacer()
+
+                    // Right panel
+                    VStack(alignment: .trailing, spacing: 8) {
+                        if showMapMenu {
+                            ScrollView {
+                                VStack(spacing: 6) {
+                                    ForEach(uniqueLocations, id: \.self) { location in
+                                        Button(location) {
+                                            selectedLocation = selectedLocation == location ? nil : location
+                                            showMapMenu = false
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .padding(8)
+                                        .background(selectedLocation == location ? Color.blue : Color(.systemGray5))
+                                        .foregroundColor(selectedLocation == location ? .white : .primary)
+                                        .cornerRadius(8)
+                                        .font(.caption)
+                                    }
+                                }
+                                .padding(12)
+                            }
+                            .frame(width: 200, height: 400)
+                            .background(Color(.systemBackground))
+                            .cornerRadius(12)
+                            .shadow(radius: 8)
+                        }
+                    }
+                    .padding(.trailing, 16)
+                }
+
+                // Bottom button bar
+                HStack {
+
+                    // Left flag buttons
+                    HStack(spacing: 8) {
+                        sideButton(icon: showFlags ? "flag.fill" : "flag", isActive: showFlags) {
+                            showFlags.toggle()
+                            showHMs = false
+                            showTrainers = false
+                        }
+                        sideButton(icon: showHMs ? "opticaldisc.fill" : "opticaldisc", isActive: showHMs) {
+                            showHMs.toggle()
+                            showFlags = false
+                            showTrainers = false
+                        }
+                        sideButton(icon: showTrainers ? "person.fill" : "person", isActive: showTrainers) {
+                            showTrainers.toggle()
+                            showFlags = false
+                            showHMs = false
+                        }
+                    }
+                    .padding(.leading, 16)
+
+                    Spacer()
+
+                    // Right map button
+                    sideButton(icon: showMapMenu ? "map.fill" : "map", isActive: showMapMenu) {
+                        showMapMenu.toggle()
+                    }
+                    .padding(.trailing, 16)
+                }
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
             }
         }
         .navigationTitle(MainSaveFile.name)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            MainSaveFile.reloadFlags()
+        }
         .onDisappear {
             onDisappear()
         }
@@ -130,7 +197,7 @@ struct SaveView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(8)
-                    .background(MainSaveFile.flags[flagID] == true ? Color.green : Color.red)
+                    .background(MainSaveFile.flags[flagID] == true ? Color.green : Color.gray)
                     .foregroundColor(.white)
                     .cornerRadius(8)
                     .font(.caption)
@@ -149,10 +216,9 @@ struct SaveView: View {
         Button(action: action) {
             Image(systemName: icon)
                 .padding(10)
-                .background(isActive ? Color.blue : Color.clear)
-                .foregroundColor(isActive ? .white : .blue)
+                .background(Color.red)
+                .foregroundColor(.white)
                 .clipShape(Circle())
-                .overlay(Circle().stroke(Color.blue, lineWidth: 2))
         }
     }
 }
