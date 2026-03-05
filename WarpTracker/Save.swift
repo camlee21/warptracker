@@ -105,9 +105,9 @@ struct Save: Codable, Hashable {
             let data = try encoder.encode(self)
             let url = Save.saveURL(name: name)
             try data.write(to: url)
-            print("Saved to \(url)")
+            print("💾 Saving \(name), flags true: \(flags.filter { $0.value }.keys.sorted())")
         } catch {
-            print("Failed to save: \(error)")
+            print("❌ Failed to save: \(error)")
         }
     }
 
@@ -116,9 +116,11 @@ struct Save: Codable, Hashable {
         do {
             let data = try Data(contentsOf: url)
             let decoder = PropertyListDecoder()
-            return try decoder.decode(Save.self, from: data)
+            let save = try decoder.decode(Save.self, from: data)
+            print("✅ Loaded \(name), flags: \(save.flags.filter { $0.value == true })")
+            return save
         } catch {
-            print("Failed to load: \(error)")
+            print("❌ Failed to load \(name): \(error)")
             return nil
         }
     }
@@ -129,7 +131,7 @@ struct Save: Codable, Hashable {
     }
     
     mutating func reloadFlags() {
-        // update flags
+        // update traversal flags
         if self.flags["GOT_ROCK_SMASH"] == true && self.flags["DEFEATED_GYM_1"] == true {
             self.traversalFlags["CAN_ROCK_SMASH"] = true
         } else {
@@ -171,7 +173,13 @@ struct Save: Codable, Hashable {
             self.traversalFlags["CAN_WATERFALL"] = false
         }
         
+        // reset available to starting warps before re-expanding
+        self.available = ["Verity_Lake_Entrance"]
+        
         // update available warps
         expandAvailable()
+        
+        // save changes
+        saveToDisk()
     }
 }

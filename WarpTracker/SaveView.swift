@@ -15,12 +15,16 @@ struct SaveView: View {
     @State var showFlags: Bool = false
     @State var showHMs: Bool = false
     @State var showTrainers: Bool = false
+    let onDisappear: () -> Void
 
-    init(save: Save) {
+    init(save: Save, onDisappear: @escaping () -> Void = {}) {
         var graph = WarpGraph()
         graph.loadFromFiles()
+        var loaded = Save.loadFromDisk(name: save.name) ?? save
+        loaded.graph = graph
         _PlatinumWarpGraph = State(initialValue: graph)
-        _MainSaveFile = State(initialValue: save)
+        _MainSaveFile = State(initialValue: loaded)
+        self.onDisappear = onDisappear
     }
     
     func formatFlagID(_ flagID: String) -> String {
@@ -105,15 +109,8 @@ struct SaveView: View {
         }
         .navigationTitle(MainSaveFile.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            Button {
-                MainSaveFile.saveToDisk()
-            } label: {
-                Image(systemName: "square.and.arrow.down")
-            }
-        }
-        .task {
-            MainSaveFile.reloadFlags()
+        .onDisappear {
+            onDisappear()
         }
     }
 

@@ -13,7 +13,7 @@ func dblLinkGroup(_ warpGraph: inout WarpGraph, _ array: [String]) {
             if i != j {
                 let result = warpGraph.addDoubleLink(between: array[i], and: array[j])
                 if !result {
-                    print("Failed to link: \(array[i]) <-> \(array[j])")
+//                    print("Failed to link: \(array[i]) <-> \(array[j])")
                 }
             }
         }

@@ -15,12 +15,13 @@ struct SaveSelectView: View {
     @State var newSaveName: String = ""
     @State var saveToDelete: Save? = nil
     @State var showDeleteConfirmation: Bool = false
-    
+    @State var newSave: Save? = nil
+
     var body: some View {
         NavigationStack {
             List(saves.sorted(by: { $0.name < $1.name }), id: \.name) { save in
                 NavigationLink(save.name) {
-                    SaveView(save: save)
+                    SaveView(save: save, onDisappear: loadAllSaves)
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
@@ -39,6 +40,9 @@ struct SaveSelectView: View {
                     Image(systemName: "plus")
                 }
             }
+            .navigationDestination(item: $newSave) { save in
+                SaveView(save: save, onDisappear: loadAllSaves)
+            }
             .sheet(isPresented: $showNewSaveSheet) {
                 VStack(spacing: 20) {
                     Text("New Save")
@@ -54,9 +58,10 @@ struct SaveSelectView: View {
                         .foregroundColor(.red)
                         Spacer()
                         Button("Create") {
-                            createNewSave(name: newSaveName)
+                            let save = createNewSave(name: newSaveName)
                             newSaveName = ""
                             showNewSaveSheet = false
+                            newSave = save
                         }
                         .disabled(newSaveName.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
@@ -87,7 +92,7 @@ struct SaveSelectView: View {
             loadAllSaves()
         }
     }
-    
+
     func loadAllSaves() {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         do {
@@ -100,15 +105,17 @@ struct SaveSelectView: View {
             print("Failed to list saves: \(error)")
         }
     }
-    
-    func createNewSave(name: String) {
+
+    @discardableResult
+    func createNewSave(name: String) -> Save {
         var graph = WarpGraph()
         graph.loadFromFiles()
-        var newSave = Save(name: name, date: Date(), graph: graph)
-        newSave.saveToDisk()
-        saves.append(newSave)
+        var save = Save(name: name, date: Date(), graph: graph)
+        save.saveToDisk()
+        saves.append(save)
+        return save
     }
-    
+
     func deleteSave(_ save: Save) {
         let url = Save.saveURL(name: save.name)
         do {
