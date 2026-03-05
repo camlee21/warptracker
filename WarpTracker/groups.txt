@@ -53,6 +53,7 @@ Floaroma_Centre_Left
 Floaroma_Centre_Right
 -- Eterna --
 Eterna_Centre_Entrance
+Eterna_Dig_House
 Eterna_Mart_Entrance
 Eterna_Gym_Entrance
 Eterna_Gate_South
@@ -421,6 +422,9 @@ Survival_Area_Centre_Entrance
 Survival_Area_Mart_Entrance
 Survival_Area_House
 Survival_Area_Battleground
+Survival_Area_Centre_Exit
+Survival_Area_Centre_Left
+Survival_Area_Centre_Right
 -- Iron Island First Room --
 Iron_Island_Room_1_Exit
 Iron_Island_Room_1_Left

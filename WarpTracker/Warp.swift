@@ -1,21 +1,18 @@
-//
-//  Warp.swift
-//  WarpTracker
-//
-//  Created by Cameron Lee on 5/3/2026.
-//
+// Warp.swift
 
 import Foundation
 
 struct Warp: Codable, Hashable {
     var id: String
     var location: String
-    var neighbours: [String]  // Store IDs, not Warp objects
+    var neighbours: [String]
+    var linked: String?  // ID of the warp this has been manually linked to
 
     init(id: String, location: String = "") {
         self.id = id
         self.location = location
         self.neighbours = []
+        self.linked = nil
     }
 
     mutating func addLink(_ warpID: String) {

@@ -1,4 +1,4 @@
-Verity_Lake_Entrance, Lake Verity
+Verity_Lake_Entrance, Verity Lakefront
 Sandgem_Centre_Entrance, Sandgem
 Sandgem_Mart_Entrance, Sandgem
 Sandgem_House_Left, Sandgem
@@ -45,6 +45,7 @@ Floaroma_Centre_Exit, Floaroma
 Floaroma_Centre_Left, Floaroma
 Floaroma_Centre_Right, Floaroma
 Eterna_Centre_Entrance, Eterna
+Eterna_Dig_House, Eterna
 Eterna_Mart_Entrance, Eterna
 Eterna_Gym_Entrance, Eterna
 Eterna_Gate_South, Eterna
@@ -176,14 +177,14 @@ Sunyshore_House_Right, Sunyshore
 Sunyshore_Centre_Exit, Sunyshore
 Sunyshore_Centre_Left, Sunyshore
 Sunyshore_Centre_Right, Sunyshore
-Valor_House_Bottom, Valor Lake
-Valor_House_Rock_Climb, Valor Lake
-Valor_House_Bottom_Left, Valor Lake
-Valor_House_Bottom_Right, Valor Lake
-Valor_Cafe_Entrance, Valor Lake
-Valor_House_West, Valor Lake
-Valor_House_North, Valor Lake
-Valor_Lake_Entrance, Valor Lake
+Valor_House_Bottom, Valor Lakefront
+Valor_House_Rock_Climb, Valor Lakefront
+Valor_House_Bottom_Left, Valor Lakefront
+Valor_House_Bottom_Right, Valor Lakefront
+Valor_Cafe_Entrance, Valor Lakefront
+Valor_House_West, Valor Lakefront
+Valor_House_North, Valor Lakefront
+Valor_Lake_Entrance, Valor Lakefront
 Route_222_House_Left, Route 222
 Route_222_House_Right, Route 222
 Route_222_Gate, Route 222
@@ -319,11 +320,11 @@ GHQ_Cyrus_Warp_Green, Galactic HQ
 GHQ_Cyrus_Warp_Top_Right, Galactic HQ
 GHQ_Cyrus_Warp_Room, Galactic HQ
 GHQ_Cyrus_Stairs, Galactic HQ
-Acuity_Lake_Entrance, Acuity Lake
-Acuity_Lake_Exit, Acuity Lake
-Acuity_Lake_Cave, Acuity Lake
-Valor_Lake_Exit, Valor Lake
-Valor_Lake_Cave, Valor Lake
+Acuity_Lake_Entrance, Acuity Lakefront
+Acuity_Lake_Exit, Lake Acuity
+Acuity_Lake_Cave, Lake Acuity
+Valor_Lake_Exit, Lake Valor
+Valor_Lake_Cave, Lake Valor
 Verity_Lake_Exit, Lake Verity
 Verity_Lake_Cave, Lake Verity
 Coronet_Cyrus_Exit_Left, Mt Coronet
@@ -360,10 +361,10 @@ League_Centre_Big_Exit, Pokemon League
 League_Centre_Big_E4, Pokemon League
 League_Centre_Big_Up, Pokemon League
 League_Centre_Big_Down, Pokemon League
-Pokemon_League_Entrance, Pokemon League
-Pokemon_League_E4_Exit, Pokemon League
+Pokemon_League_Entrance, Pokemon League Outside
+Pokemon_League_E4_Exit, Pokemon League Outside
 Victory_Road_Entrance, Victory Road
-Stark_Mountain_Entrance, Route 227
+Stark_Mountain_Entrance, Stark Mountain
 Route_227_House, Route 227
 Route_226_House, Route 226
 Route_226_Gate, Route 226
@@ -388,6 +389,9 @@ Survival_Area_Mart_Entrance, Survival Area
 Survival_Area_House, Survival Area
 Survival_Area_Battleground, Survival Area
 Survival_Area_Rock_House, Survival Area
+Survival_Area_Centre_Exit, Survival Area
+Survival_Area_Centre_Left, Survival Area
+Survival_Area_Centre_Right, Survival Area
 Fuego_Ironworks_Entrance, Fuego Ironworks
 Fuego_Ironworks_Meadow_Entrance, Fuego Ironworks
 Iron_Island_Room_1_Exit, Iron Island

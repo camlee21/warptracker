@@ -55,6 +55,15 @@ struct WarpGraph: Codable, Hashable {
         warps[warp2ID]!.addLink(warp1ID)
         return true
     }
+    
+    mutating func userLink(between warp1ID: String, and warp2ID: String) -> Bool {
+        guard warps[warp1ID] != nil,
+              warps[warp2ID] != nil else { return false }
+        warps[warp1ID]!.linked = warp2ID
+        warps[warp2ID]!.linked = warp1ID
+        _ = addDoubleLink(between: warp1ID, and: warp2ID)
+        return true
+    }
 
     mutating func removeDoubleLink(between warp1ID: String, and warp2ID: String) {
         guard warps[warp1ID] != nil,
@@ -63,6 +72,14 @@ struct WarpGraph: Codable, Hashable {
               checkLink(from: warp2ID, to: warp1ID) else { return }
         warps[warp1ID]!.removeLink(warp2ID)
         warps[warp2ID]!.removeLink(warp1ID)
+        warps[warp1ID]!.linked = nil
+        warps[warp2ID]!.linked = nil
+    }
+    
+    mutating func unlinkWarps(warp1ID: String, warp2ID: String) {
+        removeDoubleLink(between: warp1ID, and: warp2ID)
+        warps[warp1ID]?.linked = nil
+        warps[warp2ID]?.linked = nil
     }
     
     // MARK: - Link Checking

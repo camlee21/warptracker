@@ -1,10 +1,3 @@
-//
-//  SaveView.swift
-//  WarpTracker
-//
-//  Created by Cameron Lee on 5/3/2026.
-//
-
 // SaveView.swift
 
 import SwiftUI
@@ -17,6 +10,8 @@ struct SaveView: View {
     @State var showTrainers: Bool = false
     @State var showMapMenu: Bool = false
     @State var selectedLocation: String? = "Sandgem"
+    @State var linkState: LinkState = .idle
+    @State var showUnlinkConfirmation: Bool = false
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -58,24 +53,94 @@ struct SaveView: View {
 
             // Background map image
             if let location = selectedLocation {
-                MapView(locationID: location)
-                    .ignoresSafeArea()
+                MapView(
+                    locationID: location,
+                    linkState: $linkState,
+                    save: $MainSaveFile,
+                    selectedLocation: $selectedLocation,
+                    imageSize: imageSizes[location] ?? CGSize(width: 800, height: 600)
+                )
+                .ignoresSafeArea()
             }
 
-            // Top right warp counter
+            // Top right area
             VStack {
                 HStack {
                     Spacer()
-                    Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(20)
+
+                    if case .firstSelected(let id) = linkState {
+                        // Unlink button (only if warp has a linked warp)
+                        if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
+                            Button {
+                                showUnlinkConfirmation = true
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "link.badge.minus")
+                                    Text("Unlink")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                            }
+                            .padding(.top, 8)
+                            .padding(.trailing, 4)
+                            .confirmationDialog(
+                                "Unlink \(id)?",
+                                isPresented: $showUnlinkConfirmation,
+                                titleVisibility: .visible
+                            ) {
+                                Button("Unlink", role: .destructive) {
+                                    if let linkedID = MainSaveFile.graph.warps[id]?.linked {
+                                        MainSaveFile.graph.unlinkWarps(warp1ID: id, warp2ID: linkedID)
+                                        MainSaveFile.reloadFlags()
+                                    }
+                                    linkState = .idle
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            } message: {
+                                Text("This will remove the link between these two warps.")
+                            }
+                        }
+
+                        // Linking label
+                        Text("Linking: \(id)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.yellow)
+                            .foregroundColor(.black)
+                            .cornerRadius(20)
+                            .padding(.top, 8)
+                            .padding(.trailing, 4)
+
+                        // Cancel button
+                        Button {
+                            linkState = .idle
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                                .font(.title3)
+                        }
                         .padding(.top, 8)
                         .padding(.trailing, 16)
+
+                    } else {
+                        Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .padding(.top, 8)
+                            .padding(.trailing, 16)
+                    }
                 }
                 Spacer()
             }
@@ -84,7 +149,6 @@ struct SaveView: View {
             VStack {
                 Spacer()
 
-                // Panels above the bottom bar
                 HStack(alignment: .bottom) {
 
                     // Left panels
@@ -138,8 +202,6 @@ struct SaveView: View {
 
                 // Bottom button bar
                 HStack {
-
-                    // Left flag buttons
                     HStack(spacing: 8) {
                         sideButton(icon: showFlags ? "flag.fill" : "flag", isActive: showFlags) {
                             showFlags.toggle()
@@ -161,7 +223,6 @@ struct SaveView: View {
 
                     Spacer()
 
-                    // Right map button
                     sideButton(icon: showMapMenu ? "map.fill" : "map", isActive: showMapMenu) {
                         showMapMenu.toggle()
                     }
@@ -173,9 +234,6 @@ struct SaveView: View {
         }
         .navigationTitle(MainSaveFile.name)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            MainSaveFile.reloadFlags()
-        }
         .onDisappear {
             onDisappear()
         }
@@ -197,7 +255,7 @@ struct SaveView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(8)
-                    .background(MainSaveFile.flags[flagID] == true ? Color.green : Color.gray)
+                    .background(MainSaveFile.flags[flagID] == true ? Color.green : Color.red)
                     .foregroundColor(.white)
                     .cornerRadius(8)
                     .font(.caption)
@@ -216,7 +274,7 @@ struct SaveView: View {
         Button(action: action) {
             Image(systemName: icon)
                 .padding(10)
-                .background(Color.red)
+                .background(Color.blue)
                 .foregroundColor(.white)
                 .clipShape(Circle())
         }
