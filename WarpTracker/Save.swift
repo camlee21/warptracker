@@ -63,7 +63,7 @@ struct Save: Codable, Hashable {
     var date: Date
     var graph: WarpGraph
     var flags: [String: Bool]
-    var traversalFlags: [String: Bool] = [:]
+    var traversalFlags: [String: Bool]
     var available: [String]
     
     init(name: String, date: Date, graph: WarpGraph) {
@@ -71,22 +71,9 @@ struct Save: Codable, Hashable {
         self.date = date
         self.graph = graph
         self.flags = starting_flags
+        self.traversalFlags = starting_traversal_flags
         self.available = [
-//            "Verity_Lake_Entrance",
-//            "Sandgem_Centre_Entrance",
-//            "Sandgem_Mart_Entrance",
-//            "Sandgem_House_Left",
-//            "Sandgem_House_Right",
-//            "Jubilife_House_Bottom",
-//            "Jubilife_Centre_Entrance",
-//            "Jubilife_Mart_Entrance",
-//            "Jubilife_Condo",
-//            "Jubilife_TV_Entrance",
-//            "Jubilife_Poketch_Left",
-//            "Jubilife_Poketch_Right",
-//            "Jublife_Gate_West",
-//            "Route_204_Cave_South",
-            "Route_203_Cave"
+            "Verity_Lake_Entrance"
         ]
     }
     
@@ -111,31 +98,77 @@ struct Save: Codable, Hashable {
         }
     }
     
+    mutating func saveToDisk() {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .xml
+        do {
+            let data = try encoder.encode(self)
+            let url = Save.saveURL(name: name)
+            try data.write(to: url)
+            print("Saved to \(url)")
+        } catch {
+            print("Failed to save: \(error)")
+        }
+    }
+
+    static func loadFromDisk(name: String) -> Save? {
+        let url = Save.saveURL(name: name)
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = PropertyListDecoder()
+            return try decoder.decode(Save.self, from: data)
+        } catch {
+            print("Failed to load: \(error)")
+            return nil
+        }
+    }
+
+    static func saveURL(name: String) -> URL {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documents.appendingPathComponent("\(name).plist")
+    }
+    
     mutating func reloadFlags() {
         // update flags
         if self.flags["GOT_ROCK_SMASH"] == true && self.flags["DEFEATED_GYM_1"] == true {
             self.traversalFlags["CAN_ROCK_SMASH"] = true
+        } else {
+            self.traversalFlags["CAN_ROCK_SMASH"] = false
         }
         if self.flags["GOT_CUT"] == true && self.flags["DEFEATED_GYM_2"] == true {
             self.traversalFlags["CAN_CUT"] = true
+        } else {
+            self.traversalFlags["CAN_CUT"] = false
         }
         if self.flags["GOT_DEFOG"] == true && self.flags["DEFEATED_GYM_3"] == true {
             self.traversalFlags["CAN_DEFOG"] = true
+        } else {
+            self.traversalFlags["CAN_DEFOG"] = false
         }
         if self.flags["GOT_FLY"] == true && self.flags["DEFEATED_GYM_4"] == true {
             self.traversalFlags["CAN_FLY"] = true
+        } else {
+            self.traversalFlags["CAN_FLY"] = false
         }
         if self.flags["GOT_SURF"] == true && self.flags["DEFEATED_GYM_5"] == true {
             self.traversalFlags["CAN_SURF"] = true
+        } else {
+            self.traversalFlags["CAN_SURF"] = false
         }
         if self.flags["GOT_STRENGTH"] == true && self.flags["DEFEATED_GYM_6"] == true {
             self.traversalFlags["CAN_STRENGTH"] = true
+        } else {
+            self.traversalFlags["CAN_STRENGTH"] = false
         }
         if self.flags["GOT_ROCK_CLIMB"] == true && self.flags["DEFEATED_GYM_7"] == true {
             self.traversalFlags["CAN_ROCK_CLIMB"] = true
+        } else {
+            self.traversalFlags["CAN_ROCK_CLIMB"] = false
         }
         if self.flags["GOT_WATERFALL"] == true && self.flags["DEFEATED_GYM_8"] == true {
             self.traversalFlags["CAN_WATERFALL"] = true
+        } else {
+            self.traversalFlags["CAN_WATERFALL"] = false
         }
         
         // update available warps

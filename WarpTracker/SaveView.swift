@@ -1,23 +1,24 @@
 //
-//  ContentView.swift
+//  SaveView.swift
 //  WarpTracker
 //
 //  Created by Cameron Lee on 5/3/2026.
 //
 
+// SaveView.swift
+
 import SwiftUI
 
-struct ContentView: View {
+struct SaveView: View {
     @State var PlatinumWarpGraph: WarpGraph
     @State var MainSaveFile: Save
     @State var showFlags: Bool = false
     @State var showHMs: Bool = false
     @State var showTrainers: Bool = false
 
-    init() {
+    init(save: Save) {
         var graph = WarpGraph()
         graph.loadFromFiles()
-        let save = Save(name: "Save 1", date: Date(), graph: graph)
         _PlatinumWarpGraph = State(initialValue: graph)
         _MainSaveFile = State(initialValue: save)
     }
@@ -102,6 +103,15 @@ struct ContentView: View {
                 Spacer()
             }
         }
+        .navigationTitle(MainSaveFile.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button {
+                MainSaveFile.saveToDisk()
+            } label: {
+                Image(systemName: "square.and.arrow.down")
+            }
+        }
         .task {
             MainSaveFile.reloadFlags()
         }
@@ -151,5 +161,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    NavigationStack {
+        SaveView(save: Save(name: "Preview Save", date: Date(), graph: WarpGraph()))
+    }
 }
