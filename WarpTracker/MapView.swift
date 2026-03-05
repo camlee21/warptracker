@@ -13,9 +13,8 @@ struct MapView: View {
     @Binding var save: Save
     @Binding var selectedLocation: String?
     @State var glowingWarpID: String? = nil
-    @State var debugTapPercent: CGPoint? = nil
 
-    let imageSize: CGSize  // actual pixel dimensions of the source image
+    let imageSize: CGSize
 
     func getImgFromID(_ id: String) -> String {
         switch id {
@@ -86,19 +85,16 @@ struct MapView: View {
         }
     }
 
-    // Calculate the actual rendered rect of the image within a given frame
     func renderedImageRect(in frameSize: CGSize) -> CGRect {
         let imageAspect = imageSize.width / imageSize.height
         let frameAspect = frameSize.width / frameSize.height
 
         let renderedSize: CGSize
         if imageAspect > frameAspect {
-            // Image is wider — constrained by width
             let w = frameSize.width
             let h = w / imageAspect
             renderedSize = CGSize(width: w, height: h)
         } else {
-            // Image is taller — constrained by height
             let h = frameSize.height
             let w = h * imageAspect
             renderedSize = CGSize(width: w, height: h)
@@ -115,7 +111,12 @@ struct MapView: View {
         case .firstSelected(let id) where id == warpID: return .yellow
         default:
             let warp = save.graph.warps[warpID]
-            return warp?.linked != nil ? .green : .red
+            let isAvailable = save.available.contains(warpID)
+            if warp?.linked != nil {
+                return isAvailable ? .green : .gray
+            } else {
+                return isAvailable ? .red : .gray
+            }
         }
     }
 
@@ -174,7 +175,6 @@ struct MapView: View {
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: geometry.size.height)
 
-                    // Warp dots - positioned relative to actual image rect
                     ForEach(pointsForLocation, id: \.warpID) { point in
                         let x = imgRect.origin.x + imgRect.size.width * point.xPercent
                         let y = imgRect.origin.y + imgRect.size.height * point.yPercent
@@ -205,74 +205,6 @@ struct MapView: View {
                         .onTapGesture { handleWarpTap(point.warpID) }
                         .onLongPressGesture(minimumDuration: 1.0) { handleWarpLongPress(point.warpID) }
                     }
-
-                    // Debug grid
-                    GeometryReader { imageGeometry in
-                        let w = imgRect.size.width
-                        let h = imgRect.size.height
-                        let ox = imgRect.origin.x
-                        let oy = imgRect.origin.y
-
-                        ForEach(1..<10) { i in
-                            let xPos = ox + w * Double(i) / 10.0
-                            let yPos = oy + h * Double(i) / 10.0
-
-                            Path { path in
-                                path.move(to: CGPoint(x: xPos, y: oy))
-                                path.addLine(to: CGPoint(x: xPos, y: oy + h))
-                            }
-                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
-
-                            Path { path in
-                                path.move(to: CGPoint(x: ox, y: yPos))
-                                path.addLine(to: CGPoint(x: ox + w, y: yPos))
-                            }
-                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
-
-                            Text("\(i * 10)%")
-                                .font(.system(size: 7))
-                                .foregroundColor(.white)
-                                .background(Color.black.opacity(0.5))
-                                .position(x: xPos, y: oy + 8)
-
-                            Text("\(i * 10)%")
-                                .font(.system(size: 7))
-                                .foregroundColor(.white)
-                                .background(Color.black.opacity(0.5))
-                                .position(x: ox + 16, y: yPos)
-                        }
-
-                        // Debug tap indicator
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .gesture(
-                                DragGesture(minimumDistance: 0)
-                                    .onEnded { value in
-                                        let tapX = value.location.x
-                                        let tapY = value.location.y
-                                        let xPct = (tapX - imgRect.origin.x) / imgRect.size.width
-                                        let yPct = (tapY - imgRect.origin.y) / imgRect.size.height
-                                        debugTapPercent = CGPoint(x: xPct, y: yPct)
-                                        print("Tapped: xPercent: \(String(format: "%.3f", xPct)), yPercent: \(String(format: "%.3f", yPct))")
-                                    }
-                            )
-
-                        if let pct = debugTapPercent {
-                            let tx = imgRect.origin.x + pct.x * imgRect.size.width
-                            let ty = imgRect.origin.y + pct.y * imgRect.size.height
-                            Circle()
-                                .fill(Color.cyan)
-                                .frame(width: 10, height: 10)
-                                .position(x: tx, y: ty)
-                            Text(String(format: "(%.2f, %.2f)", pct.x, pct.y))
-                                .font(.system(size: 9))
-                                .foregroundColor(.white)
-                                .padding(3)
-                                .background(Color.black.opacity(0.7))
-                                .cornerRadius(4)
-                                .position(x: tx + 40, y: ty - 10)
-                        }
-                    }
                 }
             }
         }
@@ -281,7 +213,7 @@ struct MapView: View {
 
 #Preview {
     MapView(
-        locationID: "Stark Mountain",
+        locationID: "Sandgem",
         linkState: .constant(.idle),
         save: .constant(Save(name: "Preview", date: Date(), graph: WarpGraph())),
         selectedLocation: .constant("Sandgem"),

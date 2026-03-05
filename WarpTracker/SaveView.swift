@@ -18,6 +18,14 @@ struct SaveView: View {
         var graph = WarpGraph()
         graph.loadFromFiles()
         var loaded = Save.loadFromDisk(name: save.name) ?? save
+
+        // Copy linked values from saved graph into the fresh graph
+        for (id, savedWarp) in loaded.graph.warps {
+            if let linkedID = savedWarp.linked {
+                graph.warps[id]?.linked = linkedID
+            }
+        }
+
         loaded.graph = graph
         _PlatinumWarpGraph = State(initialValue: graph)
         _MainSaveFile = State(initialValue: loaded)
