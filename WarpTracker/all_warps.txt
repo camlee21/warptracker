@@ -174,6 +174,7 @@ Sunyshore_Gate_South, Sunyshore
 Sunyshore_Mart_House, Sunyshore
 Sunyshore_House_Left, Sunyshore
 Sunyshore_House_Right, Sunyshore
+Sunyshore_Rock_House, Sunyshore
 Sunyshore_Centre_Exit, Sunyshore
 Sunyshore_Centre_Left, Sunyshore
 Sunyshore_Centre_Right, Sunyshore
@@ -370,7 +371,7 @@ Route_226_House, Route 226
 Route_226_Gate, Route 226
 Eterna_Forest_Entrance, Route 205
 Route_205_House, Route 205
-Valley_Windworks_Entrance, Route 205
+Valley_Windworks_Entrance, Valley Windworks
 Route_206_Cave_Entrance, Route 206
 Route_206_Hidden_Cave_Entrance, Route 206
 Bicycle_Road_Entrance, Route 206

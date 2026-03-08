@@ -7,12 +7,18 @@ enum LinkState: Equatable {
     case firstSelected(warpID: String)
 }
 
+let iconNames = ["dead_end", "event", "trainer", "bike", "unsure"]
+
+// Set to true to show percentage grid overlay for warp placement
+let debugGridEnabled = false
+
 struct MapView: View {
     var locationID: String
     @Binding var linkState: LinkState
     @Binding var save: Save
     @Binding var selectedLocation: String?
     @State var glowingWarpID: String? = nil
+    @State var debugTapPercent: CGPoint? = nil
 
     let imageSize: CGSize
 
@@ -31,6 +37,7 @@ struct MapView: View {
         case "Oreburgh Gate": return "oreburgh_gate"
         case "Floaroma": return "floaroma"
         case "Floaroma Meadow": return "floaroma_meadow"
+        case "Valley Windworks": return "valley_windworks"
         case "Eterna": return "eterna"
         case "Eterna Forest": return "eterna_forest"
         case "Hearthome": return "hearthome"
@@ -122,8 +129,13 @@ struct MapView: View {
 
     func linkLabel(for warpID: String) -> String {
         guard let warp = save.graph.warps[warpID] else { return "???" }
-        if let linkedID = warp.linked, let linkedWarp = save.graph.warps[linkedID] {
-            return linkedWarp.location
+        if let linkedID = warp.linked {
+            if iconNames.contains(linkedID) {
+                return linkedID.replacingOccurrences(of: "_", with: " ").capitalized
+            }
+            if let linkedWarp = save.graph.warps[linkedID] {
+                return linkedWarp.location
+            }
         }
         return "???"
     }
@@ -146,6 +158,7 @@ struct MapView: View {
     func handleWarpLongPress(_ warpID: String) {
         guard let warp = save.graph.warps[warpID],
               let linkedID = warp.linked,
+              !iconNames.contains(linkedID),
               let linkedWarp = save.graph.warps[linkedID] else { return }
 
         selectedLocation = linkedWarp.location
@@ -167,43 +180,122 @@ struct MapView: View {
             let frameSize = geometry.size
             let imgRect = renderedImageRect(in: frameSize)
 
-            ScrollView {
-                ZStack(alignment: .topLeading) {
-                    Image(getImgFromID(locationID))
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: geometry.size.height)
+            ZStack(alignment: .topLeading) {
+                Image(getImgFromID(locationID))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: geometry.size.height)
 
-                    ForEach(pointsForLocation, id: \.warpID) { point in
-                        let x = imgRect.origin.x + imgRect.size.width * point.xPercent
-                        let y = imgRect.origin.y + imgRect.size.height * point.yPercent
+                // Warp dots
+                ForEach(pointsForLocation, id: \.warpID) { point in
+                    let x = imgRect.origin.x + imgRect.size.width * point.xPercent
+                    let y = imgRect.origin.y + imgRect.size.height * point.yPercent
 
-                        ZStack {
-                            if glowingWarpID == point.warpID {
-                                Circle()
-                                    .fill(Color.white.opacity(0.6))
-                                    .frame(width: 28, height: 28)
-                                    .blur(radius: 6)
-                            }
+                    let linkedID = save.graph.warps[point.warpID]?.linked
+                    let isIcon = linkedID != nil && iconNames.contains(linkedID!)
 
+                    ZStack {
+                        if glowingWarpID == point.warpID {
+                            Circle()
+                                .fill(Color.white.opacity(0.6))
+                                .frame(width: 28, height: 28)
+                                .blur(radius: 6)
+                        }
+
+                        if isIcon {
+                            Image(linkedID!)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .shadow(radius: 2)
+                        } else {
                             Circle()
                                 .fill(dotColor(for: point.warpID))
                                 .frame(width: 14, height: 14)
                                 .shadow(radius: 2)
                                 .animation(.easeInOut(duration: 0.3), value: glowingWarpID)
+                        }
 
-                            Text(linkLabel(for: point.warpID))
-                                .font(.system(size: 8))
+                        Text(linkLabel(for: point.warpID))
+                            .font(.system(size: 8))
+                            .foregroundColor(.white)
+                            .padding(3)
+                            .background(Color.black.opacity(0.6))
+                            .cornerRadius(4)
+                            .offset(y: -18)
+                    }
+                    .position(x: x, y: y)
+                    .onTapGesture { handleWarpTap(point.warpID) }
+                    .onLongPressGesture(minimumDuration: 1.0) { handleWarpLongPress(point.warpID) }
+                }
+
+                // Debug grid — toggle with debugGridEnabled at top of file
+                if debugGridEnabled {
+                    GeometryReader { _ in
+                        let w = imgRect.size.width
+                        let h = imgRect.size.height
+                        let ox = imgRect.origin.x
+                        let oy = imgRect.origin.y
+
+                        ForEach(1..<10) { i in
+                            let xPos = ox + w * Double(i) / 10.0
+                            let yPos = oy + h * Double(i) / 10.0
+
+                            Path { path in
+                                path.move(to: CGPoint(x: xPos, y: oy))
+                                path.addLine(to: CGPoint(x: xPos, y: oy + h))
+                            }
+                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
+
+                            Path { path in
+                                path.move(to: CGPoint(x: ox, y: yPos))
+                                path.addLine(to: CGPoint(x: ox + w, y: yPos))
+                            }
+                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
+
+                            Text("\(i * 10)%")
+                                .font(.system(size: 7))
+                                .foregroundColor(.white)
+                                .background(Color.black.opacity(0.5))
+                                .position(x: xPos, y: oy + 8)
+
+                            Text("\(i * 10)%")
+                                .font(.system(size: 7))
+                                .foregroundColor(.white)
+                                .background(Color.black.opacity(0.5))
+                                .position(x: ox + 16, y: yPos)
+                        }
+
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onEnded { value in
+                                        let tapX = value.location.x
+                                        let tapY = value.location.y
+                                        let xPct = (tapX - imgRect.origin.x) / imgRect.size.width
+                                        let yPct = (tapY - imgRect.origin.y) / imgRect.size.height
+                                        debugTapPercent = CGPoint(x: xPct, y: yPct)
+                                        print("Tapped: xPercent: \(String(format: "%.3f", xPct)), yPercent: \(String(format: "%.3f", yPct))")
+                                    }
+                            )
+
+                        if let pct = debugTapPercent {
+                            let tx = imgRect.origin.x + pct.x * imgRect.size.width
+                            let ty = imgRect.origin.y + pct.y * imgRect.size.height
+                            Circle()
+                                .fill(Color.cyan)
+                                .frame(width: 10, height: 10)
+                                .position(x: tx, y: ty)
+                            Text(String(format: "(%.3f, %.3f)", pct.x, pct.y))
+                                .font(.system(size: 9))
                                 .foregroundColor(.white)
                                 .padding(3)
-                                .background(Color.black.opacity(0.6))
+                                .background(Color.black.opacity(0.7))
                                 .cornerRadius(4)
-                                .offset(y: -18)
+                                .position(x: tx + 50, y: ty - 10)
                         }
-                        .position(x: x, y: y)
-                        .onTapGesture { handleWarpTap(point.warpID) }
-                        .onLongPressGesture(minimumDuration: 1.0) { handleWarpLongPress(point.warpID) }
                     }
                 }
             }

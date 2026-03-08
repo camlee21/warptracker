@@ -12,6 +12,7 @@ struct SaveView: View {
     @State var selectedLocation: String? = "Sandgem"
     @State var linkState: LinkState = .idle
     @State var showUnlinkConfirmation: Bool = false
+    @State var selectedIcon: String? = nil
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -19,10 +20,10 @@ struct SaveView: View {
         graph.loadFromFiles()
         var loaded = Save.loadFromDisk(name: save.name) ?? save
 
-        // Copy linked values from saved graph into the fresh graph
         for (id, savedWarp) in loaded.graph.warps {
             if let linkedID = savedWarp.linked {
                 graph.warps[id]?.linked = linkedID
+                _ = graph.addDoubleLink(between: id, and: linkedID)
             }
         }
 
@@ -35,6 +36,48 @@ struct SaveView: View {
     var uniqueLocations: [String] {
         let locations = MainSaveFile.graph.warps.values.map { $0.location }
         return Array(Set(locations)).sorted()
+    }
+
+    func locationStatus(_ location: String) -> Color {
+        let locationWarps = MainSaveFile.graph.warps.values.filter { $0.location == location }
+        guard !locationWarps.isEmpty else { return Color(.systemGray5) }
+
+        let terminalIcons = ["dead_end", "event"]
+
+        let availableWarps = locationWarps.filter { MainSaveFile.available.contains($0.id) }
+
+        // Gray: no warps are available
+        if availableWarps.isEmpty {
+            return Color(.systemGray5)
+        }
+
+        // Green: ALL warps linked to another warp or dead_end/event
+        let allWarpsFullyLinked = locationWarps.allSatisfy { warp in
+            guard let linkedID = warp.linked else { return false }
+            if terminalIcons.contains(linkedID) { return true }
+            return MainSaveFile.graph.warps[linkedID] != nil
+        }
+
+        if allWarpsFullyLinked {
+            return Color.green
+        }
+
+        // Check if all AVAILABLE warps are linked to something
+        let allAvailableLinked = availableWarps.allSatisfy { warp in
+            warp.linked != nil
+        }
+
+        if allAvailableLinked {
+            // More muted green if any available warp is linked to a non-terminal icon
+            let hasNonTerminalIconLink = availableWarps.contains { warp in
+                guard let linkedID = warp.linked else { return false }
+                return iconNames.contains(linkedID) && !terminalIcons.contains(linkedID)
+            }
+            return hasNonTerminalIconLink ? Color.green.opacity(0.5) : Color.green.opacity(0.7)
+        }
+
+        // Red: at least one available warp is unlinked
+        return Color.red.opacity(0.7)
     }
 
     func formatFlagID(_ flagID: String) -> String {
@@ -56,10 +99,42 @@ struct SaveView: View {
         }
     }
 
+    func handleIconTap(_ iconName: String) {
+        switch linkState {
+        case .idle:
+            if selectedIcon == iconName {
+                selectedIcon = nil
+            } else {
+                selectedIcon = iconName
+            }
+        case .firstSelected(let warpID):
+            MainSaveFile.graph.warps[warpID]?.linked = iconName
+            MainSaveFile.reloadFlags()
+            linkState = .idle
+            selectedIcon = nil
+        }
+    }
+
+    func unlinkIcon(_ iconName: String) {
+        for id in MainSaveFile.graph.warps.keys {
+            if MainSaveFile.graph.warps[id]?.linked == iconName {
+                MainSaveFile.graph.warps[id]?.linked = nil
+            }
+        }
+        MainSaveFile.reloadFlags()
+        selectedIcon = nil
+    }
+
     var body: some View {
         ZStack {
 
-            // Background map image
+            // Background image
+            Image("save_background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            // Map view
             if let location = selectedLocation {
                 MapView(
                     locationID: location,
@@ -71,73 +146,131 @@ struct SaveView: View {
                 .ignoresSafeArea()
             }
 
-            // Top right area
+            // Top area
             VStack {
-                HStack {
-                    Spacer()
+                HStack(alignment: .center) {
 
                     if case .firstSelected(let id) = linkState {
-                        // Unlink button (only if warp has a linked warp)
-                        if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
-                            Button {
-                                showUnlinkConfirmation = true
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "link.badge.minus")
-                                    Text("Unlink")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
+                        // Icon row on left during linking
+                        HStack(spacing: 8) {
+                            ForEach(iconNames, id: \.self) { iconName in
+                                Button {
+                                    handleIconTap(iconName)
+                                } label: {
+                                    Image(iconName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 28, height: 28)
+                                        .padding(4)
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.orange)
-                                .foregroundColor(.white)
-                                .cornerRadius(20)
-                            }
-                            .padding(.top, 8)
-                            .padding(.trailing, 4)
-                            .confirmationDialog(
-                                "Unlink \(id)?",
-                                isPresented: $showUnlinkConfirmation,
-                                titleVisibility: .visible
-                            ) {
-                                Button("Unlink", role: .destructive) {
-                                    if let linkedID = MainSaveFile.graph.warps[id]?.linked {
-                                        MainSaveFile.graph.unlinkWarps(warp1ID: id, warp2ID: linkedID)
-                                        MainSaveFile.reloadFlags()
-                                    }
-                                    linkState = .idle
-                                }
-                                Button("Cancel", role: .cancel) {}
-                            } message: {
-                                Text("This will remove the link between these two warps.")
                             }
                         }
+                        .padding(.leading, 16)
+                        .padding(.top, 8)
 
-                        // Linking label
-                        Text("Linking: \(id)")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.yellow)
-                            .foregroundColor(.black)
-                            .cornerRadius(20)
-                            .padding(.top, 8)
-                            .padding(.trailing, 4)
+                        Spacer()
 
-                        // Cancel button
-                        Button {
-                            linkState = .idle
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.title3)
+                        // Unlink + label + cancel on right
+                        HStack(spacing: 4) {
+                            if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
+                                Button {
+                                    showUnlinkConfirmation = true
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "link.badge.minus")
+                                        Text("Unlink")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.orange)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                                }
+                                .confirmationDialog(
+                                    "Unlink \(id)?",
+                                    isPresented: $showUnlinkConfirmation,
+                                    titleVisibility: .visible
+                                ) {
+                                    Button("Unlink", role: .destructive) {
+                                        if let linkedID = MainSaveFile.graph.warps[id]?.linked {
+                                            if iconNames.contains(linkedID) {
+                                                MainSaveFile.graph.warps[id]?.linked = nil
+                                                MainSaveFile.reloadFlags()
+                                            } else {
+                                                MainSaveFile.graph.unlinkWarps(warp1ID: id, warp2ID: linkedID)
+                                                MainSaveFile.reloadFlags()
+                                            }
+                                        }
+                                        linkState = .idle
+                                    }
+                                    Button("Cancel", role: .cancel) {}
+                                } message: {
+                                    Text("This will remove the link between these two warps.")
+                                }
+                            }
+
+                            Text("Linking: \(id)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.yellow)
+                                .foregroundColor(.black)
+                                .cornerRadius(20)
+
+                            Button {
+                                linkState = .idle
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .font(.title3)
+                            }
                         }
                         .padding(.top, 8)
                         .padding(.trailing, 16)
 
                     } else {
+                        // Icon row on left
+                        HStack(spacing: 8) {
+                            ForEach(iconNames, id: \.self) { iconName in
+                                Button {
+                                    handleIconTap(iconName)
+                                } label: {
+                                    Image(iconName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 28, height: 28)
+                                        .padding(4)
+                                        .background(selectedIcon == iconName ? Color.yellow : Color.black.opacity(0.5))
+                                        .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(selectedIcon == iconName ? Color.yellow : Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                }
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        unlinkIcon(iconName)
+                                    } label: {
+                                        Label("Unlink all \(iconName)", systemImage: "link.badge.minus")
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.leading, 16)
+                        .padding(.top, 8)
+
+                        Spacer()
+
+                        // Availability counter on right
                         Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
                             .font(.caption)
                             .fontWeight(.bold)
@@ -150,6 +283,7 @@ struct SaveView: View {
                             .padding(.trailing, 16)
                     }
                 }
+
                 Spacer()
             }
 
@@ -191,9 +325,14 @@ struct SaveView: View {
                                         }
                                         .frame(maxWidth: .infinity)
                                         .padding(8)
-                                        .background(selectedLocation == location ? Color.blue : Color(.systemGray5))
-                                        .foregroundColor(selectedLocation == location ? .white : .primary)
+                                        .background(locationStatus(location))
+                                        .foregroundColor(.primary)
+                                        .colorScheme(.light)
                                         .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(selectedLocation == location ? Color.blue : Color.clear, lineWidth: 2)
+                                        )
                                         .font(.caption)
                                     }
                                 }

@@ -73,7 +73,21 @@ struct Save: Codable, Hashable {
         self.flags = starting_flags
         self.traversalFlags = starting_traversal_flags
         self.available = [
-            "Verity_Lake_Entrance"
+            "Verity_Lake_Entrance",
+            "Sandgem_Centre_Entrance",
+            "Sandgem_Mart_Entrance",
+            "Sandgem_House_Left",
+            "Sandgem_House_Right",
+            "Jubilife_House_Bottom",
+            "Jubilife_Centre_Entrance",
+            "Jubilife_Mart_Entrance",
+            "Jubilife_Condo",
+            "Jubilife_TV_Entrance",
+            "Jubilife_Poketch_Left",
+            "Jubilife_Poketch_Right",
+            "Jublife_Gate_West",
+            "Route_204_Cave_South",
+            "Route_203_Cave"
         ]
     }
     

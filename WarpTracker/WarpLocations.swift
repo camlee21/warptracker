@@ -72,6 +72,7 @@ let imageSizes: [String: CGSize] = [
     "Lake Valor": CGSize(width: 864, height: 720),
     "Lake Acuity": CGSize(width: 752, height: 612),
     "Pokemon League Outside": CGSize(width: 496, height: 996),
+    "Valley Windworks": CGSize(width: 512, height: 407),
 ]
 
 let warpPoints: [String: [WarpPoint]] = [
@@ -100,9 +101,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Jubilife_Centre_Right", xPercent: 0.94, yPercent: 0.95),
     ],
     "Jubilife GTS": [
-        WarpPoint(warpID: "Jubilife_GTS_Warp_Red", xPercent: 0.73, yPercent: 0.39),
-        WarpPoint(warpID: "Jubilife_GTS_Warp_Green", xPercent: 0.59, yPercent: 0.39),
-        WarpPoint(warpID: "Jubilife_GTS_Exit", xPercent: 0.48, yPercent: 0.81),
+        WarpPoint(warpID: "Jubilife_GTS_Warp_Red", xPercent: 0.74, yPercent: 0.30),
+        WarpPoint(warpID: "Jubilife_GTS_Warp_Green", xPercent: 0.59, yPercent: 0.30),
+        WarpPoint(warpID: "Jubilife_GTS_Exit", xPercent: 0.48, yPercent: 0.89),
     ],
     "Oreburgh": [
         WarpPoint(warpID: "Oreburgh_Centre_Entrance", xPercent: 0.76, yPercent: 0.33),
@@ -132,6 +133,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Floaroma_Centre_Left", xPercent: 0.07, yPercent: 0.77),
         WarpPoint(warpID: "Floaroma_Centre_Right", xPercent: 0.30, yPercent: 0.77),
     ],
+    "Valley Windworks": [
+        WarpPoint(warpID: "Valley_Windworks_Entrance", xPercent: 0.55, yPercent: 0.48),
+    ],
     "Route 204": [
         WarpPoint(warpID: "Route_204_Cave_South", xPercent: 0.20, yPercent: 0.82),
         WarpPoint(warpID: "Route_204_Cave_North", xPercent: 0.69, yPercent: 0.30),
@@ -151,9 +155,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Eterna_House_North", xPercent: 0.52, yPercent: 0.15),
         WarpPoint(warpID: "Eterna_House_South", xPercent: 0.07, yPercent: 0.88),
         WarpPoint(warpID: "Eterna_House_East", xPercent: 0.80, yPercent: 0.44),
-        WarpPoint(warpID: "Eterna_Centre_Exit", xPercent: 0.81, yPercent: 0.77),
-        WarpPoint(warpID: "Eterna_Centre_Left", xPercent: 0.70, yPercent: 0.74),
-        WarpPoint(warpID: "Eterna_Centre_Right", xPercent: 0.92, yPercent: 0.74),
+        WarpPoint(warpID: "Eterna_Centre_Exit", xPercent: 0.82, yPercent: 0.77),
+        WarpPoint(warpID: "Eterna_Centre_Left", xPercent: 0.70, yPercent: 0.75),
+        WarpPoint(warpID: "Eterna_Centre_Right", xPercent: 0.92, yPercent: 0.75),
     ],
     "Eterna Forest": [
         WarpPoint(warpID: "Eterna_Forest_Exit_South", xPercent: 0.32, yPercent: 0.85),
@@ -239,7 +243,7 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Veilstone_Centre_Right", xPercent: 0.22, yPercent: 0.15),
     ],
     "Dept Store": [
-        WarpPoint(warpID: "Dept_Store_B1F", xPercent: 0.28, yPercent: 0.86),
+        WarpPoint(warpID: "Dept_Store_B1F", xPercent: 0.28, yPercent: 0.83),
         WarpPoint(warpID: "Dept_Store_1F_Exit", xPercent: 0.28, yPercent: 0.60),
         WarpPoint(warpID: "Dept_Store_1F_Down", xPercent: 0.19, yPercent: 0.52),
         WarpPoint(warpID: "Dept_Store_1F_Up", xPercent: 0.36, yPercent: 0.52),
@@ -271,12 +275,12 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Route_212_Gate", xPercent: 0.21, yPercent: 0.27),
     ],
     "Backlot Mansion": [
-        WarpPoint(warpID: "Backlot_Mansion_Left_1", xPercent: 0.37, yPercent: 0.47),
-        WarpPoint(warpID: "Backlot_Mansion_Left_2", xPercent: 0.23, yPercent: 0.47),
-        WarpPoint(warpID: "Backlot_Mansion_Left_3", xPercent: 0.10, yPercent: 0.47),
-        WarpPoint(warpID: "Backlot_Mansion_Right", xPercent: 0.84, yPercent: 0.47),
-        WarpPoint(warpID: "Backlot_Mansion_Top", xPercent: 0.58, yPercent: 0.35),
-        WarpPoint(warpID: "Backlot_Mansion_Bottom", xPercent: 0.58, yPercent: 0.78),
+        WarpPoint(warpID: "Backlot_Mansion_Left_1", xPercent: 0.37, yPercent: 0.40),
+        WarpPoint(warpID: "Backlot_Mansion_Left_2", xPercent: 0.23, yPercent: 0.40),
+        WarpPoint(warpID: "Backlot_Mansion_Left_3", xPercent: 0.10, yPercent: 0.40),
+        WarpPoint(warpID: "Backlot_Mansion_Right", xPercent: 0.84, yPercent: 0.40),
+        WarpPoint(warpID: "Backlot_Mansion_Top", xPercent: 0.58, yPercent: 0.25),
+        WarpPoint(warpID: "Backlot_Mansion_Bottom", xPercent: 0.58, yPercent: 0.80),
     ],
     "Celestic": [
         WarpPoint(warpID: "Celestic_Centre_Entrance", xPercent: 0.52, yPercent: 0.85),
@@ -285,9 +289,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Celestic_House_South", xPercent: 0.14, yPercent: 0.85),
         WarpPoint(warpID: "Celestic_Hall_North", xPercent: 0.33, yPercent: 0.29),
         WarpPoint(warpID: "Celestic_Ruins_Entrance", xPercent: 0.33, yPercent: 0.48),
-        WarpPoint(warpID: "Celestic_Centre_Exit", xPercent: 0.85, yPercent: 0.35),
-        WarpPoint(warpID: "Celestic_Centre_Left", xPercent: 0.77, yPercent: 0.32),
-        WarpPoint(warpID: "Celestic_Centre_Right", xPercent: 0.94, yPercent: 0.32),
+        WarpPoint(warpID: "Celestic_Centre_Exit", xPercent: 0.85, yPercent: 0.31),
+        WarpPoint(warpID: "Celestic_Centre_Left", xPercent: 0.77, yPercent: 0.27),
+        WarpPoint(warpID: "Celestic_Centre_Right", xPercent: 0.94, yPercent: 0.27),
     ],
     "Canalave": [
         WarpPoint(warpID: "Canalave_Centre_Entrance", xPercent: 0.54, yPercent: 0.26),
@@ -300,9 +304,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Canalave_House_Bottom_Left", xPercent: 0.16, yPercent: 0.70),
         WarpPoint(warpID: "Canalave_House_Top_Right", xPercent: 0.44, yPercent: 0.44),
         WarpPoint(warpID: "Canalave_House_Bottom_Right", xPercent: 0.46, yPercent: 0.70),
-        WarpPoint(warpID: "Canalave_Centre_Exit", xPercent: 0.82, yPercent: 0.69),
-        WarpPoint(warpID: "Canalave_Centre_Left", xPercent: 0.71, yPercent: 0.67),
-        WarpPoint(warpID: "Canalave_Centre_Right", xPercent: 0.92, yPercent: 0.67),
+        WarpPoint(warpID: "Canalave_Centre_Exit", xPercent: 0.82, yPercent: 0.65),
+        WarpPoint(warpID: "Canalave_Centre_Left", xPercent: 0.71, yPercent: 0.61),
+        WarpPoint(warpID: "Canalave_Centre_Right", xPercent: 0.92, yPercent: 0.61),
     ],
     "Iron Island": [
         WarpPoint(warpID: "Iron_Island_House", xPercent: 0.15, yPercent: 0.49),
@@ -347,6 +351,7 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Sunyshore_Mart_House", xPercent: 0.21, yPercent: 0.57),
         WarpPoint(warpID: "Sunyshore_House_Left", xPercent: 0.70, yPercent: 0.10),
         WarpPoint(warpID: "Sunyshore_House_Right", xPercent: 0.83, yPercent: 0.10),
+        WarpPoint(warpID: "Sunyshore_Rock_House", xPercent: 0.91, yPercent: 0.55),
         WarpPoint(warpID: "Sunyshore_Centre_Exit", xPercent: 0.88, yPercent: 0.38),
         WarpPoint(warpID: "Sunyshore_Centre_Left", xPercent: 0.82, yPercent: 0.36),
         WarpPoint(warpID: "Sunyshore_Centre_Right", xPercent: 0.94, yPercent: 0.36),
@@ -381,9 +386,9 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Fight_Area_House_Bottom", xPercent: 0.70, yPercent: 0.82),
         WarpPoint(warpID: "Fight_Area_Frontier_Entrance", xPercent: 0.71, yPercent: 0.27),
         WarpPoint(warpID: "Fight_Area_Gate_North", xPercent: 0.08, yPercent: 0.21),
-        WarpPoint(warpID: "Fight_Area_Centre_Exit", xPercent: 0.24, yPercent: 0.92),
-        WarpPoint(warpID: "Fight_Area_Centre_Left", xPercent: 0.14, yPercent: 0.89),
-        WarpPoint(warpID: "Fight_Area_Centre_Right", xPercent: 0.35, yPercent: 0.89),
+        WarpPoint(warpID: "Fight_Area_Centre_Exit", xPercent: 0.24, yPercent: 0.96),
+        WarpPoint(warpID: "Fight_Area_Centre_Left", xPercent: 0.14, yPercent: 0.91),
+        WarpPoint(warpID: "Fight_Area_Centre_Right", xPercent: 0.35, yPercent: 0.91),
     ],
     "Resort Area": [
         WarpPoint(warpID: "Resort_Area_Centre_Entrance", xPercent: 0.05, yPercent: 0.80),
