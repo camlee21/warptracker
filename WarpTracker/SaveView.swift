@@ -23,7 +23,7 @@ struct SaveView: View {
         for (id, savedWarp) in loaded.graph.warps {
             if let linkedID = savedWarp.linked {
                 graph.warps[id]?.linked = linkedID
-                _ = graph.addDoubleLink(between: id, and: linkedID)
+                _ = graph.addDoubleLink(between: id, and: linkedID)  // use addDoubleLink directly
             }
         }
 
@@ -79,24 +79,89 @@ struct SaveView: View {
         // Red: at least one available warp is unlinked
         return Color.red.opacity(0.7)
     }
+    
+    let flagDisplayNames: [String: String] = [
+        // Story flags
+        "GOT_WORKS_KEY": "Works Key",
+        "GOT_GALACTIC_KEY": "Galactic Key",
+        "GOT_BIKE": "Bike",
+        "GOT_SECRET_POTION": "Secret Potion",
+        "SEEN_ROARK": "Roark Seen",
+        "SEEN_FANTINA": "Fantina Seen",
+        "SEEN_VOLKNER": "Volkner Seen",
+        "DEFEATED_MARS_WINDWORKS": "Mars",
+
+        // HMs
+        "GOT_ROCK_SMASH": "Rock Smash",
+        "GOT_CUT": "Cut",
+        "GOT_FLY": "Fly",
+        "GOT_DEFOG": "Defog",
+        "GOT_SURF": "Surf",
+        "GOT_STRENGTH": "Strength",
+        "GOT_ROCK_CLIMB": "Rock Climb",
+        "GOT_WATERFALL": "Waterfall",
+        "GOT_TELEPORT": "Teleport",
+
+        // Gyms
+        "DEFEATED_GYM_1": "Roark",
+        "DEFEATED_GYM_2": "Gardenia",
+        "DEFEATED_GYM_3": "Maylene",
+        "DEFEATED_GYM_4": "Crasher Wake",
+        "DEFEATED_GYM_5": "Fantina",
+        "DEFEATED_GYM_6": "Byron",
+        "DEFEATED_GYM_7": "Candice",
+        "DEFEATED_GYM_8": "Volkner",
+
+        // Elite Four
+        "DEFEATED_AARON": "Aaron",
+        "DEFEATED_BERTHA": "Bertha",
+        "DEFEATED_FLINT": "Flint",
+        "DEFEATED_LUCIAN": "Lucian",
+        "DEFEATED_CYNTHIA": "Cynthia",
+    ]
+
+    let flagImageNames: [String: String] = [
+        // Story flags
+        "GOT_WORKS_KEY": "WorksKey",
+        "GOT_GALACTIC_KEY": "GalacticKey",
+        "GOT_BIKE": "Bike 2",
+        "GOT_SECRET_POTION": "SecretPotion",
+        "SEEN_ROARK": "Roark",
+        "SEEN_FANTINA": "Fantina",
+        "SEEN_VOLKNER": "Volkner",
+        "DEFEATED_MARS_WINDWORKS": "DefeatedWindworks",
+
+        // HMs
+        "GOT_ROCK_SMASH": "RockSmash",
+        "GOT_CUT": "Cut",
+        "GOT_FLY": "Fly",
+        "GOT_DEFOG": "Defog",
+        "GOT_SURF": "Surf",
+        "GOT_STRENGTH": "Strength",
+        "GOT_ROCK_CLIMB": "RockClimb",
+        "GOT_WATERFALL": "Waterfall",
+        "GOT_TELEPORT": "Teleport",
+
+        // Gyms
+        "DEFEATED_GYM_1": "CoalBadge",
+        "DEFEATED_GYM_2": "ForestBadge",
+        "DEFEATED_GYM_3": "CobbleBadge",
+        "DEFEATED_GYM_4": "FenBadge",
+        "DEFEATED_GYM_5": "RelicBadge",
+        "DEFEATED_GYM_6": "MineBadge",
+        "DEFEATED_GYM_7": "IcicleBadge",
+        "DEFEATED_GYM_8": "BeaconBadge",
+
+        // Elite Four
+        "DEFEATED_AARON": "Aaron",
+        "DEFEATED_BERTHA": "Bertha",
+        "DEFEATED_FLINT": "Flint",
+        "DEFEATED_LUCIAN": "Lucian",
+        "DEFEATED_CYNTHIA": "Cynthia",
+    ]
 
     func formatFlagID(_ flagID: String) -> String {
-        let parts = flagID.components(separatedBy: "_")
-        switch parts.first {
-        case "GOT":
-            return parts.dropFirst().map { $0.capitalized }.joined(separator: " ") + " Got"
-        case "SEEN":
-            return parts.dropFirst().map { $0.capitalized }.joined(separator: " ") + " Seen"
-        case "DEFEATED":
-            if parts[1] == "GYM" {
-                return "Gym \(parts[2]) Defeated"
-            }
-            return parts.dropFirst().map { $0.capitalized }.joined(separator: " ") + " Defeated"
-        case "CAN":
-            return "Can " + parts.dropFirst().map { $0.capitalized }.joined(separator: " ")
-        default:
-            return parts.map { $0.capitalized }.joined(separator: " ")
-        }
+        return flagDisplayNames[flagID] ?? flagID
     }
 
     func handleIconTap(_ iconName: String) {
@@ -176,7 +241,7 @@ struct SaveView: View {
 
                         Spacer()
 
-                        // Unlink + label + cancel on right
+                        // Unlink + cancel on right
                         HStack(spacing: 4) {
                             if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
                                 Button {
@@ -216,15 +281,6 @@ struct SaveView: View {
                                     Text("This will remove the link between these two warps.")
                                 }
                             }
-
-                            Text("Linking: \(id)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.yellow)
-                                .foregroundColor(.black)
-                                .cornerRadius(20)
 
                             Button {
                                 linkState = .idle
@@ -281,6 +337,22 @@ struct SaveView: View {
                             .cornerRadius(20)
                             .padding(.top, 8)
                             .padding(.trailing, 16)
+                    }
+                }
+
+                // Linking label on its own row below
+                if case .firstSelected(let id) = linkState {
+                    HStack {
+                        Spacer()
+                        Text("Linking: \(id)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.yellow)
+                            .foregroundColor(.black)
+                            .cornerRadius(20)
+                        Spacer()
                     }
                 }
 
@@ -392,20 +464,22 @@ struct SaveView: View {
         let rowHeight: CGFloat = 44
         let padding: CGFloat = 16
         let totalHeight = rowCount * rowHeight + padding * 2
+        let lastKeyIsOdd = keys.count % 2 != 0
+        let pairedKeys = stride(from: 0, to: lastKeyIsOdd ? keys.count - 1 : keys.count, by: 2).map {
+            (keys[$0], keys[$0 + 1])
+        }
 
         ScrollView {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                ForEach(keys, id: \.self) { flagID in
-                    Button(formatFlagID(flagID)) {
-                        MainSaveFile.changeFlag(flagID: flagID)
-                        MainSaveFile.reloadFlags()
+            VStack(spacing: 8) {
+                ForEach(Array(pairedKeys.enumerated()), id: \.offset) { _, pair in
+                    HStack(spacing: 8) {
+                        flagButton(pair.0)
+                        flagButton(pair.1)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-                    .background(MainSaveFile.flags[flagID] == true ? Color.green : Color.red)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    .font(.caption)
+                }
+                if lastKeyIsOdd, let lastKey = keys.last {
+                    flagButton(lastKey)
+                        .frame(maxWidth: .infinity)
                 }
             }
             .padding(padding)
@@ -414,6 +488,43 @@ struct SaveView: View {
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(radius: 8)
+    }
+    
+    @ViewBuilder
+    func flagButton(_ flagID: String) -> some View {
+        HStack(spacing: 6) {
+            if let imageName = flagImageNames[flagID] {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+            }
+            Text(formatFlagID(flagID))
+                .font(.caption)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(8)
+        .background(flagColor(for: flagID))
+        .foregroundColor(.white)
+        .cornerRadius(8)
+        .onTapGesture {
+            MainSaveFile.changeFlag(flagID: flagID)
+            MainSaveFile.reloadFlags()
+        }
+        .onLongPressGesture(minimumDuration: 0.5) {
+            MainSaveFile.discoverFlag(flagID: flagID)
+            MainSaveFile.reloadFlags()
+        }
+    }
+
+    func flagColor(for flagID: String) -> Color {
+        switch MainSaveFile.flags[flagID] {
+        case .done: return .green
+        case .discovered: return .yellow
+        default: return .red
+        }
     }
 
     @ViewBuilder

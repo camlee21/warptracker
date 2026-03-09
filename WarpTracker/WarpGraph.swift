@@ -83,8 +83,6 @@ struct WarpGraph: Codable, Hashable {
               checkLink(from: warp2ID, to: warp1ID) else { return }
         warps[warp1ID]!.removeLink(warp2ID)
         warps[warp2ID]!.removeLink(warp1ID)
-        warps[warp1ID]!.linked = nil
-        warps[warp2ID]!.linked = nil
     }
     
     mutating func unlinkWarps(warp1ID: String, warp2ID: String) {
