@@ -19,6 +19,7 @@ struct SaveView: View {
     @State var showSuccessAlert: Bool = false
     @State var showFailureAlert: Bool = false
     @State var alertMessage: String = ""
+    @State var showCounterTooltip: Bool = false
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -42,6 +43,17 @@ struct SaveView: View {
     var uniqueLocations: [String] {
         let locations = MainSaveFile.graph.warps.values.map { $0.location }
         return Array(Set(locations)).sorted()
+    }
+
+    var unlinkedAvailableCount: Int {
+        let terminalIcons = ["dead_end", "event"]
+        return MainSaveFile.available.filter { warpID in
+            guard let warp = MainSaveFile.graph.warps[warpID] else { return true }
+            guard let linkedID = warp.linked else { return true }
+            if terminalIcons.contains(linkedID) { return false }
+            if MainSaveFile.graph.warps[linkedID] != nil { return false }
+            return true
+        }.count
     }
 
     func locationStatus(_ location: String) -> Color {
@@ -341,16 +353,38 @@ struct SaveView: View {
 
                         Spacer()
 
-                        Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(20)
-                            .padding(.top, 8)
-                            .padding(.trailing, 16)
+                        ZStack(alignment: .bottom) {
+                            Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                                .onLongPressGesture(minimumDuration: 0.4) {
+                                    showCounterTooltip = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                        showCounterTooltip = false
+                                    }
+                                }
+
+                            if showCounterTooltip {
+                                Text("Unlinked / Available / Total Warps")
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.black.opacity(0.75))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                                    .offset(y: 30)
+                                    .transition(.opacity)
+                                    .animation(.easeInOut(duration: 0.2), value: showCounterTooltip)
+                            }
+                        }
+                        .padding(.top, 8)
+                        .padding(.trailing, 16)
                     }
                 }
 
@@ -493,7 +527,7 @@ struct SaveView: View {
                 if let url = urls.first {
                     importSave(from: url)
                 }
-            case .failure(let error):
+            case .failure:
                 alertMessage = "Warp layout \"\(MainSaveFile.name)\" import failed."
                 showFailureAlert = true
             }
