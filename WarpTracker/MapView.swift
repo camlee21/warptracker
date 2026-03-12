@@ -19,7 +19,13 @@ struct MapView: View {
     @Binding var selectedLocation: String?
     @State var glowingWarpID: String? = nil
     @State var debugTapPercent: CGPoint? = nil
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
 
+    let minScale: CGFloat = 1.0
+    let maxScale: CGFloat = 5.0
     let imageSize: CGSize
 
     func getImgFromID(_ id: String) -> String {
@@ -171,6 +177,15 @@ struct MapView: View {
         }
     }
 
+    func clampedOffset(_ proposedOffset: CGSize, scale: CGFloat, frameSize: CGSize) -> CGSize {
+        let maxX = frameSize.width * (scale - 1) / 2
+        let maxY = frameSize.height * (scale - 1) / 2
+        return CGSize(
+            width: min(max(proposedOffset.width, -maxX), maxX),
+            height: min(max(proposedOffset.height, -maxY), maxY)
+        )
+    }
+
     var pointsForLocation: [WarpPoint] {
         warpPoints[locationID] ?? []
     }
@@ -230,7 +245,7 @@ struct MapView: View {
                     .onLongPressGesture(minimumDuration: 1.0) { handleWarpLongPress(point.warpID) }
                 }
 
-                // Debug grid — toggle with debugGridEnabled at top of file
+                // Debug grid
                 if debugGridEnabled {
                     GeometryReader { _ in
                         let w = imgRect.size.width
@@ -299,7 +314,58 @@ struct MapView: View {
                     }
                 }
             }
+            .scaleEffect(scale)
+            .offset(offset)
+            .gesture(
+                SimultaneousGesture(
+                    MagnificationGesture()
+                        .onChanged { value in
+                            let newScale = lastScale * value
+                            scale = min(max(newScale, minScale), maxScale)
+                        }
+                        .onEnded { _ in
+                            lastScale = scale
+                            if scale <= minScale {
+                                withAnimation(.spring()) {
+                                    scale = minScale
+                                    offset = .zero
+                                }
+                                lastScale = minScale
+                                lastOffset = .zero
+                            }
+                        },
+                    DragGesture()
+                        .onChanged { value in
+                            guard scale > 1.0 else { return }
+                            let newOffset = CGSize(
+                                width: lastOffset.width + value.translation.width,
+                                height: lastOffset.height + value.translation.height
+                            )
+                            offset = clampedOffset(newOffset, scale: scale, frameSize: frameSize)
+                        }
+                        .onEnded { _ in
+                            lastOffset = offset
+                        }
+                )
+            )
+            .onChange(of: scale) { newScale in
+                if newScale <= minScale {
+                    withAnimation(.spring()) {
+                        offset = .zero
+                    }
+                    lastOffset = .zero
+                }
+            }
+            .onChange(of: locationID) { _ in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    scale = 1.0
+                    offset = .zero
+                }
+                lastScale = 1.0
+                lastOffset = .zero
+            }
         }
+        .clipped()
     }
 }
 
