@@ -3,6 +3,9 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+let topBarIcons = ["dead_end", "event", "trainer", "bike", "unsure", "level", "legendary"]
+let trainerIcons = ["Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
+
 struct SaveView: View {
     @State var PlatinumWarpGraph: WarpGraph
     @State var MainSaveFile: Save
@@ -20,6 +23,8 @@ struct SaveView: View {
     @State var showFailureAlert: Bool = false
     @State var alertMessage: String = ""
     @State var showCounterTooltip: Bool = false
+    @State var iconMenuExpanded: Bool = false
+    @State var iconCycleIndex: [String: Int] = [:]
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -46,7 +51,6 @@ struct SaveView: View {
     }
 
     var unlinkedAvailableCount: Int {
-        let terminalIcons = ["dead_end", "event"]
         return MainSaveFile.available.filter { warpID in
             guard let warp = MainSaveFile.graph.warps[warpID] else { return true }
             guard let linkedID = warp.linked else { return true }
@@ -60,7 +64,6 @@ struct SaveView: View {
         let locationWarps = MainSaveFile.graph.warps.values.filter { $0.location == location }
         guard !locationWarps.isEmpty else { return Color(.systemGray5) }
 
-        let terminalIcons = ["dead_end", "event"]
         let availableWarps = locationWarps.filter { MainSaveFile.available.contains($0.id) }
 
         if availableWarps.isEmpty { return Color(.systemGray5) }
@@ -167,17 +170,26 @@ struct SaveView: View {
             MainSaveFile.reloadFlags()
             linkState = .idle
             selectedIcon = nil
+            iconMenuExpanded = false
         }
     }
 
-    func unlinkIcon(_ iconName: String) {
-        for id in MainSaveFile.graph.warps.keys {
-            if MainSaveFile.graph.warps[id]?.linked == iconName {
-                MainSaveFile.graph.warps[id]?.linked = nil
-            }
-        }
-        MainSaveFile.reloadFlags()
-        selectedIcon = nil
+    func handleIconLongPress(_ iconName: String) {
+        // Find all warps linked to this icon, sorted by warp ID for stable ordering
+        let linkedWarps = MainSaveFile.graph.warps.values
+            .filter { $0.linked == iconName }
+            .sorted { $0.id < $1.id }
+
+        guard !linkedWarps.isEmpty else { return }
+
+        let currentIndex = iconCycleIndex[iconName] ?? 0
+        let clampedIndex = currentIndex % linkedWarps.count
+        let targetWarp = linkedWarps[clampedIndex]
+
+        selectedLocation = targetWarp.location
+
+        // Advance index for next long press, wrapping around
+        iconCycleIndex[iconName] = (clampedIndex + 1) % linkedWarps.count
     }
 
     func exportSave() {
@@ -222,6 +234,65 @@ struct SaveView: View {
         }
     }
 
+    func iconRows(from icons: [String]) -> [[String]] {
+        stride(from: 0, to: icons.count, by: 5).map {
+            Array(icons[$0..<min($0 + 5, icons.count)])
+        }
+    }
+
+    @ViewBuilder
+    func iconButton(_ iconName: String, duringLinking: Bool) -> some View {
+        let imageName = iconImageNames[iconName] ?? iconName
+        HStack {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 28, height: 28)
+                .padding(4)
+                .background(
+                    duringLinking
+                        ? Color.black.opacity(0.5)
+                        : (selectedIcon == iconName ? Color.yellow : Color.black.opacity(0.5))
+                )
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(
+                            duringLinking
+                                ? Color.white.opacity(0.3)
+                                : (selectedIcon == iconName ? Color.yellow : Color.white.opacity(0.3)),
+                            lineWidth: 1
+                        )
+                )
+        }
+        .onTapGesture {
+            handleIconTap(iconName)
+        }
+        .onLongPressGesture(minimumDuration: 0.5) {
+            guard !duringLinking else { return }
+            handleIconLongPress(iconName)
+        }
+    }
+
+    @ViewBuilder
+    func iconPanel(duringLinking: Bool) -> some View {
+        let allIcons = topBarIcons + trainerIcons
+        let rows = iconRows(from: allIcons)
+
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(rows.indices, id: \.self) { rowIndex in
+                HStack(spacing: 8) {
+                    ForEach(rows[rowIndex], id: \.self) { iconName in
+                        iconButton(iconName, duringLinking: duringLinking)
+                    }
+                }
+            }
+        }
+        .padding(8)
+        .background(Color.black.opacity(0.4))
+        .cornerRadius(10)
+    }
+
     var body: some View {
         ZStack {
 
@@ -242,152 +313,129 @@ struct SaveView: View {
             }
 
             // Top area
-            VStack {
-                HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .top) {
 
-                    if case .firstSelected(let id) = linkState {
-                        HStack(spacing: 8) {
-                            ForEach(iconNames, id: \.self) { iconName in
-                                Button {
-                                    handleIconTap(iconName)
-                                } label: {
-                                    Image(iconName)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 28, height: 28)
-                                        .padding(4)
-                                        .background(Color.black.opacity(0.5))
-                                        .cornerRadius(8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                        )
-                                }
+                    // Left: icon menu toggle + expanded panel
+                    VStack(alignment: .leading, spacing: 6) {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                iconMenuExpanded.toggle()
+                            }
+                        } label: {
+                            Image(systemName: iconMenuExpanded ? "chevron.left.circle.fill" : "chevron.right.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(4)
+                                .background(Color.black.opacity(0.4))
+                                .clipShape(Circle())
+                        }
+
+                        if iconMenuExpanded {
+                            if case .firstSelected(_) = linkState {
+                                iconPanel(duringLinking: true)
+                            } else {
+                                iconPanel(duringLinking: false)
                             }
                         }
-                        .padding(.leading, 16)
-                        .padding(.top, 8)
+                    }
+                    .padding(.leading, 16)
+                    .padding(.top, 8)
 
-                        Spacer()
+                    Spacer()
 
-                        HStack(spacing: 4) {
-                            if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
-                                Button {
-                                    showUnlinkConfirmation = true
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "link.badge.minus")
-                                        Text("Unlink")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
+                    // Right: linking controls or counter
+                    VStack(alignment: .trailing, spacing: 4) {
+                        if case .firstSelected(let id) = linkState {
+                            HStack(spacing: 4) {
+                                if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
+                                    Button {
+                                        showUnlinkConfirmation = true
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "link.badge.minus")
+                                            Text("Unlink")
+                                                .font(.caption)
+                                                .fontWeight(.bold)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(Color.orange)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(20)
                                     }
-                                    .padding(.horizontal, 10)
+                                    .confirmationDialog(
+                                        "Unlink \(id)?",
+                                        isPresented: $showUnlinkConfirmation,
+                                        titleVisibility: .visible
+                                    ) {
+                                        Button("Unlink", role: .destructive) {
+                                            if let linkedID = MainSaveFile.graph.warps[id]?.linked {
+                                                if iconNames.contains(linkedID) {
+                                                    MainSaveFile.graph.warps[id]?.linked = nil
+                                                    MainSaveFile.reloadFlags()
+                                                } else {
+                                                    MainSaveFile.graph.unlinkWarps(warp1ID: id, warp2ID: linkedID)
+                                                    MainSaveFile.reloadFlags()
+                                                }
+                                            }
+                                            linkState = .idle
+                                        }
+                                        Button("Cancel", role: .cancel) {}
+                                    } message: {
+                                        Text("This will remove the link between these two warps.")
+                                    }
+                                }
+
+                                Button {
+                                    linkState = .idle
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
+                                        .font(.title3)
+                                }
+                            }
+                            .padding(.top, 8)
+                            .padding(.trailing, 16)
+
+                        } else {
+                            ZStack(alignment: .bottomTrailing) {
+                                Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(Color.orange)
+                                    .background(Color.blue)
                                     .foregroundColor(.white)
                                     .cornerRadius(20)
-                                }
-                                .confirmationDialog(
-                                    "Unlink \(id)?",
-                                    isPresented: $showUnlinkConfirmation,
-                                    titleVisibility: .visible
-                                ) {
-                                    Button("Unlink", role: .destructive) {
-                                        if let linkedID = MainSaveFile.graph.warps[id]?.linked {
-                                            if iconNames.contains(linkedID) {
-                                                MainSaveFile.graph.warps[id]?.linked = nil
-                                                MainSaveFile.reloadFlags()
-                                            } else {
-                                                MainSaveFile.graph.unlinkWarps(warp1ID: id, warp2ID: linkedID)
-                                                MainSaveFile.reloadFlags()
-                                            }
+                                    .onLongPressGesture(minimumDuration: 0.4) {
+                                        showCounterTooltip = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                            showCounterTooltip = false
                                         }
-                                        linkState = .idle
                                     }
-                                    Button("Cancel", role: .cancel) {}
-                                } message: {
-                                    Text("This will remove the link between these two warps.")
+
+                                if showCounterTooltip {
+                                    Text("Unlinked / Available / Total Warps")
+                                        .font(.caption2)
+                                        .fontWeight(.medium)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(Color.black.opacity(0.75))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                        .offset(y: 30)
+                                        .transition(.opacity)
+                                        .animation(.easeInOut(duration: 0.2), value: showCounterTooltip)
                                 }
                             }
-
-                            Button {
-                                linkState = .idle
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.red)
-                                    .font(.title3)
-                            }
+                            .padding(.top, 8)
+                            .padding(.trailing, 16)
                         }
-                        .padding(.top, 8)
-                        .padding(.trailing, 16)
-
-                    } else {
-                        HStack(spacing: 8) {
-                            ForEach(iconNames, id: \.self) { iconName in
-                                Button {
-                                    handleIconTap(iconName)
-                                } label: {
-                                    Image(iconName)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 28, height: 28)
-                                        .padding(4)
-                                        .background(selectedIcon == iconName ? Color.yellow : Color.black.opacity(0.5))
-                                        .cornerRadius(8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(selectedIcon == iconName ? Color.yellow : Color.white.opacity(0.3), lineWidth: 1)
-                                        )
-                                }
-                                .contextMenu {
-                                    Button(role: .destructive) {
-                                        unlinkIcon(iconName)
-                                    } label: {
-                                        Label("Unlink all \(iconName)", systemImage: "link.badge.minus")
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.leading, 16)
-                        .padding(.top, 8)
-
-                        Spacer()
-
-                        ZStack(alignment: .bottom) {
-                            Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(20)
-                                .onLongPressGesture(minimumDuration: 0.4) {
-                                    showCounterTooltip = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                        showCounterTooltip = false
-                                    }
-                                }
-
-                            if showCounterTooltip {
-                                Text("Unlinked / Available / Total Warps")
-                                    .font(.caption2)
-                                    .fontWeight(.medium)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Color.black.opacity(0.75))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                                    .offset(y: 30)
-                                    .transition(.opacity)
-                                    .animation(.easeInOut(duration: 0.2), value: showCounterTooltip)
-                            }
-                        }
-                        .padding(.top, 8)
-                        .padding(.trailing, 16)
                     }
                 }
 
+                // Linking label row
                 if case .firstSelected(let id) = linkState {
                     HStack {
                         Spacer()
@@ -401,6 +449,7 @@ struct SaveView: View {
                             .cornerRadius(20)
                         Spacer()
                     }
+                    .padding(.top, 4)
                 }
 
                 Spacer()

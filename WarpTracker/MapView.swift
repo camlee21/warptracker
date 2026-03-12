@@ -7,7 +7,36 @@ enum LinkState: Equatable {
     case firstSelected(warpID: String)
 }
 
-let iconNames = ["dead_end", "event", "trainer", "bike", "unsure"]
+let iconNames = [
+    "dead_end", "event", "trainer", "bike", "unsure", "level", "legendary",
+    "Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner",
+    "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"
+]
+
+let iconImageNames: [String: String] = [
+    "dead_end": "dead_end",
+    "event": "event",
+    "trainer": "trainer",
+    "bike": "bike",
+    "unsure": "unsure",
+    "level": "Pokeball",
+    "legendary": "MasterBall",
+    "Roark": "CoalBadge",
+    "Gardenia": "ForestBadge",
+    "Maylene": "CobbleBadge",
+    "Crasher Wake": "FenBadge",
+    "Fantina": "RelicBadge",
+    "Byron": "MineBadge",
+    "Candice": "IcicleBadge",
+    "Volkner": "BeaconBadge",
+    "Aaron": "Aaron",
+    "Bertha": "Bertha",
+    "Flint": "Flint",
+    "Lucian": "Lucian",
+    "Cynthia": "Cynthia"
+]
+
+let terminalIcons = ["dead_end", "event", "legendary", "Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
 
 // Set to true to show percentage grid overlay for warp placement
 let debugGridEnabled = false
@@ -218,8 +247,8 @@ struct MapView: View {
                                 .blur(radius: 6)
                         }
 
-                        if isIcon {
-                            Image(linkedID!)
+                        if isIcon, let imgName = iconImageNames[linkedID!] {
+                            Image(imgName)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 20, height: 20)
