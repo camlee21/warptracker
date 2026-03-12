@@ -1,6 +1,7 @@
 // SaveView.swift
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SaveView: View {
     @State var PlatinumWarpGraph: WarpGraph
@@ -13,6 +14,11 @@ struct SaveView: View {
     @State var linkState: LinkState = .idle
     @State var showUnlinkConfirmation: Bool = false
     @State var selectedIcon: String? = nil
+    @State var showExportSheet: Bool = false
+    @State var showImportPicker: Bool = false
+    @State var showSuccessAlert: Bool = false
+    @State var showFailureAlert: Bool = false
+    @State var alertMessage: String = ""
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -23,7 +29,7 @@ struct SaveView: View {
         for (id, savedWarp) in loaded.graph.warps {
             if let linkedID = savedWarp.linked {
                 graph.warps[id]?.linked = linkedID
-                _ = graph.addDoubleLink(between: id, and: linkedID)  // use addDoubleLink directly
+                _ = graph.addDoubleLink(between: id, and: linkedID)
             }
         }
 
@@ -43,32 +49,19 @@ struct SaveView: View {
         guard !locationWarps.isEmpty else { return Color(.systemGray5) }
 
         let terminalIcons = ["dead_end", "event"]
-
         let availableWarps = locationWarps.filter { MainSaveFile.available.contains($0.id) }
 
-        // Gray: no warps are available
-        if availableWarps.isEmpty {
-            return Color(.systemGray5)
-        }
+        if availableWarps.isEmpty { return Color(.systemGray5) }
 
-        // Green: ALL warps linked to another warp or dead_end/event
         let allWarpsFullyLinked = locationWarps.allSatisfy { warp in
             guard let linkedID = warp.linked else { return false }
             if terminalIcons.contains(linkedID) { return true }
             return MainSaveFile.graph.warps[linkedID] != nil
         }
+        if allWarpsFullyLinked { return Color.green }
 
-        if allWarpsFullyLinked {
-            return Color.green
-        }
-
-        // Check if all AVAILABLE warps are linked to something
-        let allAvailableLinked = availableWarps.allSatisfy { warp in
-            warp.linked != nil
-        }
-
+        let allAvailableLinked = availableWarps.allSatisfy { warp in warp.linked != nil }
         if allAvailableLinked {
-            // More muted green if any available warp is linked to a non-terminal icon
             let hasNonTerminalIconLink = availableWarps.contains { warp in
                 guard let linkedID = warp.linked else { return false }
                 return iconNames.contains(linkedID) && !terminalIcons.contains(linkedID)
@@ -76,12 +69,10 @@ struct SaveView: View {
             return hasNonTerminalIconLink ? Color.green.opacity(0.5) : Color.green.opacity(0.7)
         }
 
-        // Red: at least one available warp is unlinked
         return Color.red.opacity(0.7)
     }
-    
+
     let flagDisplayNames: [String: String] = [
-        // Story flags
         "GOT_WORKS_KEY": "Works Key",
         "GOT_GALACTIC_KEY": "Galactic Key",
         "GOT_BIKE": "Bike",
@@ -90,8 +81,6 @@ struct SaveView: View {
         "SEEN_FANTINA": "Fantina Seen",
         "SEEN_VOLKNER": "Volkner Seen",
         "DEFEATED_MARS_WINDWORKS": "Mars",
-
-        // HMs
         "GOT_ROCK_SMASH": "Rock Smash",
         "GOT_CUT": "Cut",
         "GOT_FLY": "Fly",
@@ -101,8 +90,6 @@ struct SaveView: View {
         "GOT_ROCK_CLIMB": "Rock Climb",
         "GOT_WATERFALL": "Waterfall",
         "GOT_TELEPORT": "Teleport",
-
-        // Gyms
         "DEFEATED_GYM_1": "Roark",
         "DEFEATED_GYM_2": "Gardenia",
         "DEFEATED_GYM_3": "Maylene",
@@ -111,8 +98,6 @@ struct SaveView: View {
         "DEFEATED_GYM_6": "Byron",
         "DEFEATED_GYM_7": "Candice",
         "DEFEATED_GYM_8": "Volkner",
-
-        // Elite Four
         "DEFEATED_AARON": "Aaron",
         "DEFEATED_BERTHA": "Bertha",
         "DEFEATED_FLINT": "Flint",
@@ -121,7 +106,6 @@ struct SaveView: View {
     ]
 
     let flagImageNames: [String: String] = [
-        // Story flags
         "GOT_WORKS_KEY": "WorksKey",
         "GOT_GALACTIC_KEY": "GalacticKey",
         "GOT_BIKE": "Bike 2",
@@ -130,8 +114,6 @@ struct SaveView: View {
         "SEEN_FANTINA": "Fantina",
         "SEEN_VOLKNER": "Volkner",
         "DEFEATED_MARS_WINDWORKS": "DefeatedWindworks",
-
-        // HMs
         "GOT_ROCK_SMASH": "RockSmash",
         "GOT_CUT": "Cut",
         "GOT_FLY": "Fly",
@@ -141,8 +123,6 @@ struct SaveView: View {
         "GOT_ROCK_CLIMB": "RockClimb",
         "GOT_WATERFALL": "Waterfall",
         "GOT_TELEPORT": "Teleport",
-
-        // Gyms
         "DEFEATED_GYM_1": "CoalBadge",
         "DEFEATED_GYM_2": "ForestBadge",
         "DEFEATED_GYM_3": "CobbleBadge",
@@ -151,8 +131,6 @@ struct SaveView: View {
         "DEFEATED_GYM_6": "MineBadge",
         "DEFEATED_GYM_7": "IcicleBadge",
         "DEFEATED_GYM_8": "BeaconBadge",
-
-        // Elite Four
         "DEFEATED_AARON": "Aaron",
         "DEFEATED_BERTHA": "Bertha",
         "DEFEATED_FLINT": "Flint",
@@ -190,16 +168,56 @@ struct SaveView: View {
         selectedIcon = nil
     }
 
+    func exportSave() {
+        let url = Save.saveURL(name: MainSaveFile.name)
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            alertMessage = "Warp layout \"\(MainSaveFile.name)\" export failed."
+            showFailureAlert = true
+            return
+        }
+        showExportSheet = true
+    }
+
+    func importSave(from url: URL) {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = PropertyListDecoder()
+            var imported = try decoder.decode(Save.self, from: data)
+
+            var graph = WarpGraph()
+            graph.loadFromFiles()
+            for (id, savedWarp) in imported.graph.warps {
+                if let linkedID = savedWarp.linked {
+                    graph.warps[id]?.linked = linkedID
+                    _ = graph.addDoubleLink(between: id, and: linkedID)
+                }
+            }
+
+            imported.name = MainSaveFile.name
+            imported.graph = graph
+            MainSaveFile = imported
+            MainSaveFile.reloadFlags()
+
+            alertMessage = "Warp layout \"\(MainSaveFile.name)\" imported successfully."
+            showSuccessAlert = true
+
+        } catch {
+            alertMessage = "Warp layout \"\(MainSaveFile.name)\" import failed."
+            showFailureAlert = true
+        }
+    }
+
     var body: some View {
         ZStack {
 
-            // Background image
             Image("save_background")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
 
-            // Map view
             if let location = selectedLocation {
                 MapView(
                     locationID: location,
@@ -216,7 +234,6 @@ struct SaveView: View {
                 HStack(alignment: .center) {
 
                     if case .firstSelected(let id) = linkState {
-                        // Icon row on left during linking
                         HStack(spacing: 8) {
                             ForEach(iconNames, id: \.self) { iconName in
                                 Button {
@@ -241,7 +258,6 @@ struct SaveView: View {
 
                         Spacer()
 
-                        // Unlink + cancel on right
                         HStack(spacing: 4) {
                             if let warp = MainSaveFile.graph.warps[id], warp.linked != nil {
                                 Button {
@@ -294,7 +310,6 @@ struct SaveView: View {
                         .padding(.trailing, 16)
 
                     } else {
-                        // Icon row on left
                         HStack(spacing: 8) {
                             ForEach(iconNames, id: \.self) { iconName in
                                 Button {
@@ -326,7 +341,6 @@ struct SaveView: View {
 
                         Spacer()
 
-                        // Availability counter on right
                         Text("\(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
                             .font(.caption)
                             .fontWeight(.bold)
@@ -340,7 +354,6 @@ struct SaveView: View {
                     }
                 }
 
-                // Linking label on its own row below
                 if case .firstSelected(let id) = linkState {
                     HStack {
                         Spacer()
@@ -364,8 +377,6 @@ struct SaveView: View {
                 Spacer()
 
                 HStack(alignment: .bottom) {
-
-                    // Left panels
                     VStack(alignment: .leading, spacing: 8) {
                         if showFlags {
                             flagPanel(keys: ["GOT_WORKS_KEY", "GOT_GALACTIC_KEY", "GOT_BIKE", "GOT_SECRET_POTION",
@@ -385,7 +396,6 @@ struct SaveView: View {
 
                     Spacer()
 
-                    // Right panel
                     VStack(alignment: .trailing, spacing: 8) {
                         if showMapMenu {
                             ScrollView {
@@ -442,6 +452,17 @@ struct SaveView: View {
 
                     Spacer()
 
+                    HStack(spacing: 8) {
+                        sideButton(icon: "square.and.arrow.up", isActive: false) {
+                            exportSave()
+                        }
+                        sideButton(icon: "square.and.arrow.down", isActive: false) {
+                            showImportPicker = true
+                        }
+                    }
+
+                    Spacer()
+
                     sideButton(icon: showMapMenu ? "map.fill" : "map", isActive: showMapMenu) {
                         showMapMenu.toggle()
                     }
@@ -455,6 +476,37 @@ struct SaveView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
             onDisappear()
+        }
+        .sheet(isPresented: $showExportSheet, onDismiss: {
+            alertMessage = "Warp layout \"\(MainSaveFile.name)\" exported successfully."
+            showSuccessAlert = true
+        }) {
+            ShareSheet(url: Save.saveURL(name: MainSaveFile.name))
+        }
+        .fileImporter(
+            isPresented: $showImportPicker,
+            allowedContentTypes: [UTType.propertyList],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    importSave(from: url)
+                }
+            case .failure(let error):
+                alertMessage = "Warp layout \"\(MainSaveFile.name)\" import failed."
+                showFailureAlert = true
+            }
+        }
+        .alert("Success", isPresented: $showSuccessAlert) {
+            Button("Okay", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
+        }
+        .alert("Failed", isPresented: $showFailureAlert) {
+            Button("Okay", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
         }
     }
 
@@ -489,7 +541,7 @@ struct SaveView: View {
         .cornerRadius(12)
         .shadow(radius: 8)
     }
-    
+
     @ViewBuilder
     func flagButton(_ flagID: String) -> some View {
         HStack(spacing: 6) {
@@ -537,6 +589,16 @@ struct SaveView: View {
                 .clipShape(Circle())
         }
     }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
