@@ -3,7 +3,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-let topBarIcons = ["dead_end", "event", "trainer", "bike", "unsure", "level", "legendary"]
+let topBarIcons = ["dead_end", "event", "trainer", "bike", "HM", "level", "legendary"]
 let trainerIcons = ["Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
 
 struct SaveView: View {

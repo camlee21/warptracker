@@ -56,7 +56,7 @@ Eterna_House_North, Eterna
 Eterna_House_South, Eterna
 Eterna_House_East, Eterna
 Route_205_Forest_Exit, Eterna
-Route_211_Cave_West, Eterna
+Route_211_Cave_West, Route 211
 Eterna_Centre_Exit, Eterna
 Eterna_Centre_Left, Eterna
 Eterna_Centre_Right, Eterna
@@ -132,7 +132,7 @@ Celestic_House_Right, Celestic
 Celestic_House_South, Celestic
 Celestic_Hall_North, Celestic
 Celestic_Ruins_Entrance, Celestic
-Route_211_Cave_East, Celestic
+Route_211_Cave_East, Route 211
 Celestic_Centre_Exit, Celestic
 Celestic_Centre_Left, Celestic
 Celestic_Centre_Right, Celestic

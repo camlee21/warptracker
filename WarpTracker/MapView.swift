@@ -8,7 +8,7 @@ enum LinkState: Equatable {
 }
 
 let iconNames = [
-    "dead_end", "event", "trainer", "bike", "unsure", "level", "legendary",
+    "dead_end", "event", "trainer", "bike", "HM", "level", "legendary",
     "Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner",
     "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"
 ]
@@ -18,7 +18,7 @@ let iconImageNames: [String: String] = [
     "event": "event",
     "trainer": "trainer",
     "bike": "bike",
-    "unsure": "unsure",
+    "HM": "hm",
     "level": "Pokeball",
     "legendary": "MasterBall",
     "Roark": "CoalBadge",
