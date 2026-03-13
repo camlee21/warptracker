@@ -348,12 +348,12 @@ Coronet_Stairs_Cave_Exit, Mt Coronet
 Coronet_Two_Caves_Exit, Mt Coronet
 Coronet_Two_Caves_Middle, Mt Coronet
 Coronet_Two_Caves_Stairs, Mt Coronet
-Coronet_Peak_Top_Bottom_Cave, Coronet Peak
-Coronet_Peak_Top_Middle_Cave, Coronet Peak
-Coronet_Peak_Top_Upper_Cave, Coronet Peak
-Coronet_Peak_Bottom_Right_Cave, Coronet Peak
-Coronet_Peak_Bottom_Left_Cave, Coronet Peak
-Coronet_Peak_Bottom_Lower_Cave, Coronet Peak
+Coronet_Peak_Top_Bottom_Cave, Mt Coronet Peak
+Coronet_Peak_Top_Middle_Cave, Mt Coronet Peak
+Coronet_Peak_Top_Upper_Cave, Mt Coronet Peak
+Coronet_Peak_Bottom_Right_Cave, Mt Coronet Peak
+Coronet_Peak_Bottom_Left_Cave, Mt Coronet Peak
+Coronet_Peak_Bottom_Lower_Cave, Mt Coronet Peak
 League_Centre_Small_Entrance, Pokemon League
 League_Centre_Small_Exit, Pokemon League
 League_Centre_Small_Left, Pokemon League

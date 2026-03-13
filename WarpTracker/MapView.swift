@@ -9,7 +9,7 @@ enum LinkState: Equatable {
 
 let iconNames = [
     "dead_end", "event", "trainer", "bike", "HM", "level", "legendary",
-    "Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner",
+    "Roark", "Gardenia", "Fantina", "Maylene", "Crasher Wake", "Byron", "Candice", "Volkner",
     "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"
 ]
 
@@ -36,7 +36,7 @@ let iconImageNames: [String: String] = [
     "Cynthia": "Cynthia"
 ]
 
-let terminalIcons = ["dead_end", "event", "legendary", "Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
+let terminalIcons = ["dead_end", "event", "legendary", "Roark", "Gardenia", "Fantina", "Maylene", "Crasher Wake", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
 
 // Set to true to show percentage grid overlay for warp placement
 let debugGridEnabled = false
@@ -115,7 +115,7 @@ struct MapView: View {
         case "Galactic HQ": return "galactic_hq"
         case "Acuity Lakefront": return "acuity_lakefront"
         case "Mt Coronet": return "coronet"
-        case "Coronet Peak": return "coronet_peak"
+        case "Mt Coronet Peak": return "coronet_peak"
         case "Pokemon League": return "league"
         case "Pokemon League Outside": return "league_outside"
         case "Victory Road": return "victory_road"
@@ -166,10 +166,86 @@ struct MapView: View {
         guard let warp = save.graph.warps[warpID] else { return "???" }
         if let linkedID = warp.linked {
             if iconNames.contains(linkedID) {
-                return linkedID.replacingOccurrences(of: "_", with: " ").capitalized
+                // Use a display name map to preserve casing like "HM", "Dead End" etc.
+                let displayNames: [String: String] = [
+                    "dead_end": "Dead End",
+                    "event": "Event",
+                    "trainer": "Trainer",
+                    "bike": "Bike",
+                    "HM": "HM",
+                    "level": "Level",
+                    "legendary": "Legendary",
+                    "Roark": "Roark",
+                    "Gardenia": "Gardenia",
+                    "Fantina": "Fantina",
+                    "Maylene": "Maylene",
+                    "Crasher Wake": "Crasher Wake",
+                    "Byron": "Byron",
+                    "Candice": "Candice",
+                    "Volkner": "Volkner",
+                    "Aaron": "Aaron",
+                    "Bertha": "Bertha",
+                    "Flint": "Flint",
+                    "Lucian": "Lucian",
+                    "Cynthia": "Cynthia"
+                ]
+                return displayNames[linkedID] ?? linkedID
             }
             if let linkedWarp = save.graph.warps[linkedID] {
-                return linkedWarp.location
+                let customLabels: [String: String] = [
+                    // PC exits — show "X PC" instead of city name
+                    "Sandgem_Centre_Exit": "Sandgem PC",
+                    "Jubilife_Centre_Exit": "Jubilife PC",
+                    "Oreburgh_Centre_Exit": "Oreburgh PC",
+                    "Floaroma_Centre_Exit": "Floaroma PC",
+                    "Eterna_Centre_Exit": "Eterna PC",
+                    "Hearthome_Centre_Exit": "Hearthome PC",
+                    "Solaceon_Centre_Exit": "Solaceon PC",
+                    "Veilstone_Centre_Exit": "Veilstone PC",
+                    "Pastoria_Centre_Exit": "Pastoria PC",
+                    "Celestic_Centre_Exit": "Celestic PC",
+                    "Canalave_Centre_Exit": "Canalave PC",
+                    "Snowpoint_Centre_Exit": "Snowpoint PC",
+                    "Sunyshore_Centre_Exit": "Sunyshore PC",
+                    "Fight_Area_Centre_Exit": "Fight Area PC",
+                    "Survival_Area_Centre_Exit": "Survival Area PC",
+                    "Resort_Area_Centre_Exit": "Resort Area PC",
+                    "League_Centre_Small_Exit": "League PC",
+                    // PC left/right counters if used
+                    "Sandgem_Centre_Left": "Sandgem PC",
+                    "Sandgem_Centre_Right": "Sandgem PC",
+                    "Jubilife_Centre_Left": "Jubilife PC",
+                    "Jubilife_Centre_Right": "Jubilife PC",
+                    "Oreburgh_Centre_Left": "Oreburgh PC",
+                    "Oreburgh_Centre_Right": "Oreburgh PC",
+                    "Floaroma_Centre_Left": "Floaroma PC",
+                    "Floaroma_Centre_Right": "Floaroma PC",
+                    "Eterna_Centre_Left": "Eterna PC",
+                    "Eterna_Centre_Right": "Eterna PC",
+                    "Hearthome_Centre_Left": "Hearthome PC",
+                    "Hearthome_Centre_Right": "Hearthome PC",
+                    "Solaceon_Centre_Left": "Solaceon PC",
+                    "Solaceon_Centre_Right": "Solaceon PC",
+                    "Veilstone_Centre_Left": "Veilstone PC",
+                    "Veilstone_Centre_Right": "Veilstone PC",
+                    "Pastoria_Centre_Left": "Pastoria PC",
+                    "Pastoria_Centre_Right": "Pastoria PC",
+                    "Celestic_Centre_Left": "Celestic PC",
+                    "Celestic_Centre_Right": "Celestic PC",
+                    "Canalave_Centre_Left": "Canalave PC",
+                    "Canalave_Centre_Right": "Canalave PC",
+                    "Snowpoint_Centre_Left": "Snowpoint PC",
+                    "Snowpoint_Centre_Right": "Snowpoint PC",
+                    "Sunyshore_Centre_Left": "Sunyshore PC",
+                    "Sunyshore_Centre_Right": "Sunyshore PC",
+                    "Fight_Area_Centre_Left": "Fight Area PC",
+                    "Fight_Area_Centre_Right": "Fight Area PC",
+                    "Survival_Area_Centre_Left": "Survival Area PC",
+                    "Survival_Area_Centre_Right": "Survival Area PC",
+                    "Resort_Area_Centre_Left": "Resort Area PC",
+                    "Resort_Area_Centre_Right": "Resort Area PC",
+                ]
+                return customLabels[linkedID] ?? linkedWarp.location
             }
         }
         return "???"

@@ -4,7 +4,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 let topBarIcons = ["dead_end", "event", "trainer", "bike", "HM", "level", "legendary"]
-let trainerIcons = ["Roark", "Gardenia", "Maylene", "Crasher Wake", "Fantina", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
+let trainerIcons = ["Roark", "Gardenia", "Fantina", "Maylene", "Crasher Wake", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
 
 struct SaveView: View {
     @State var PlatinumWarpGraph: WarpGraph
@@ -107,9 +107,9 @@ struct SaveView: View {
         "GOT_TELEPORT": "Teleport",
         "DEFEATED_GYM_1": "Roark",
         "DEFEATED_GYM_2": "Gardenia",
-        "DEFEATED_GYM_3": "Maylene",
-        "DEFEATED_GYM_4": "Crasher Wake",
-        "DEFEATED_GYM_5": "Fantina",
+        "DEFEATED_GYM_3": "Fantina",
+        "DEFEATED_GYM_4": "Maylene",
+        "DEFEATED_GYM_5": "Crasher Wake",
         "DEFEATED_GYM_6": "Byron",
         "DEFEATED_GYM_7": "Candice",
         "DEFEATED_GYM_8": "Volkner",
@@ -140,9 +140,9 @@ struct SaveView: View {
         "GOT_TELEPORT": "Teleport",
         "DEFEATED_GYM_1": "CoalBadge",
         "DEFEATED_GYM_2": "ForestBadge",
-        "DEFEATED_GYM_3": "CobbleBadge",
-        "DEFEATED_GYM_4": "FenBadge",
-        "DEFEATED_GYM_5": "RelicBadge",
+        "DEFEATED_GYM_3": "RelicBadge",
+        "DEFEATED_GYM_4": "CobbleBadge",
+        "DEFEATED_GYM_5": "FenBadge",
         "DEFEATED_GYM_6": "MineBadge",
         "DEFEATED_GYM_7": "IcicleBadge",
         "DEFEATED_GYM_8": "BeaconBadge",
@@ -560,11 +560,13 @@ struct SaveView: View {
         .onDisappear {
             onDisappear()
         }
-        .sheet(isPresented: $showExportSheet, onDismiss: {
-            alertMessage = "Warp layout \"\(MainSaveFile.name)\" exported successfully."
-            showSuccessAlert = true
-        }) {
-            ShareSheet(url: Save.saveURL(name: MainSaveFile.name))
+        .sheet(isPresented: $showExportSheet) {
+            ShareSheet(url: Save.saveURL(name: MainSaveFile.name)) { completed in
+                if completed {
+                    alertMessage = "Warp layout \"\(MainSaveFile.name)\" exported successfully."
+                    showSuccessAlert = true
+                }
+            }
         }
         .fileImporter(
             isPresented: $showImportPicker,
@@ -676,12 +678,35 @@ struct SaveView: View {
 
 struct ShareSheet: UIViewControllerRepresentable {
     let url: URL
+    var onComplete: (Bool) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onComplete: onComplete)
+    }
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        controller.completionWithItemsHandler = { activityType, completed, _, error in
+            if error != nil {
+                context.coordinator.onComplete(false)
+            } else if completed {
+                context.coordinator.onComplete(true)
+            } else {
+                // completed = false, no error = user cancelled
+                context.coordinator.onComplete(false)
+            }
+        }
+        return controller
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+
+    class Coordinator {
+        var onComplete: (Bool) -> Void
+        init(onComplete: @escaping (Bool) -> Void) {
+            self.onComplete = onComplete
+        }
+    }
 }
 
 #Preview {

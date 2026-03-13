@@ -311,7 +311,7 @@ let warpPoints: [String: [WarpPoint]] = [
     "Iron Island": [
         WarpPoint(warpID: "Iron_Island_House", xPercent: 0.15, yPercent: 0.49),
         WarpPoint(warpID: "Iron_Island_Entrance", xPercent: 0.23, yPercent: 0.18),
-        WarpPoint(warpID: "Iron_Island_Gated_Exit", xPercent: 0.02, yPercent: 0.36),
+        WarpPoint(warpID: "Iron_Island_Gated_Exit", xPercent: 0.05, yPercent: 0.36),
         WarpPoint(warpID: "Iron_Island_Room_1_Exit", xPercent: 0.42, yPercent: 0.27),
         WarpPoint(warpID: "Iron_Island_Room_1_Left", xPercent: 0.39, yPercent: 0.15),
         WarpPoint(warpID: "Iron_Island_Room_1_Right", xPercent: 0.45, yPercent: 0.15),
@@ -519,7 +519,7 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Coronet_Two_Caves_Middle", xPercent: 0.49, yPercent: 0.03),
         WarpPoint(warpID: "Coronet_Two_Caves_Stairs", xPercent: 0.43, yPercent: 0.14),
     ],
-    "Coronet Peak": [
+    "Mt Coronet Peak": [
         WarpPoint(warpID: "Coronet_Peak_Top_Bottom_Cave", xPercent: 0.81, yPercent: 0.40),
         WarpPoint(warpID: "Coronet_Peak_Top_Middle_Cave", xPercent: 0.86, yPercent: 0.26),
         WarpPoint(warpID: "Coronet_Peak_Top_Upper_Cave", xPercent: 0.15, yPercent: 0.10),
