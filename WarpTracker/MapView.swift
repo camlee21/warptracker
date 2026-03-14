@@ -17,7 +17,7 @@ let iconImageNames: [String: String] = [
     "dead_end": "dead_end",
     "event": "event",
     "trainer": "trainer",
-    "bike": "bike",
+    "bike": "Bike 2",
     "HM": "hm",
     "level": "Pokeball",
     "legendary": "MasterBall",

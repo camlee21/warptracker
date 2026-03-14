@@ -64,6 +64,7 @@ struct Save: Codable, Hashable {
     var flags: [String: FlagState]
     var traversalFlags: [String: Bool]
     var available: [String]
+    var notes: String?
 
     init(name: String, date: Date, graph: WarpGraph) {
         self.name = name
@@ -88,6 +89,7 @@ struct Save: Codable, Hashable {
             "Route_204_Cave_South",
             "Route_203_Cave"
         ]
+        self.notes = ""
     }
 
     mutating func changeFlag(flagID: String) {

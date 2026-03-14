@@ -449,9 +449,10 @@ Iron_Island_Room_2_Exit_Right
 -- Jubilife GTS and House --
 Jubilife_GTS_Entrance
 Jubilife_GTS_House
--- Victory Road Main --
+-- Victory Road Main 1 --
 Victory_Road_Main_Cave
+Victory_Road_Main_Stairs_Right_Top
+-- Victory Road Main 2 --
 Victory_Road_Main_Stairs_Left_Middle
 Victory_Road_Main_Stairs_Right_Middle
-Victory_Road_Main_Stairs_Right_Top
 -- END OF FILE --

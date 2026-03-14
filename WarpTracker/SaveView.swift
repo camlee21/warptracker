@@ -25,6 +25,7 @@ struct SaveView: View {
     @State var showCounterTooltip: Bool = false
     @State var iconMenuExpanded: Bool = false
     @State var iconCycleIndex: [String: Int] = [:]
+    @State var showNotes: Bool = false
     let onDisappear: () -> Void
 
     init(save: Save, onDisappear: @escaping () -> Void = {}) {
@@ -175,7 +176,6 @@ struct SaveView: View {
     }
 
     func handleIconLongPress(_ iconName: String) {
-        // Find all warps linked to this icon, sorted by warp ID for stable ordering
         let linkedWarps = MainSaveFile.graph.warps.values
             .filter { $0.linked == iconName }
             .sorted { $0.id < $1.id }
@@ -187,8 +187,6 @@ struct SaveView: View {
         let targetWarp = linkedWarps[clampedIndex]
 
         selectedLocation = targetWarp.location
-
-        // Advance index for next long press, wrapping around
         iconCycleIndex[iconName] = (clampedIndex + 1) % linkedWarps.count
     }
 
@@ -344,7 +342,7 @@ struct SaveView: View {
 
                     Spacer()
 
-                    // Right: linking controls or counter
+                    // Right: linking controls or counter + notes button
                     VStack(alignment: .trailing, spacing: 4) {
                         if case .firstSelected(let id) = linkState {
                             HStack(spacing: 4) {
@@ -399,6 +397,7 @@ struct SaveView: View {
                             .padding(.trailing, 16)
 
                         } else {
+                            // Counter
                             ZStack(alignment: .bottomTrailing) {
                                 Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
                                     .font(.caption)
@@ -431,6 +430,26 @@ struct SaveView: View {
                             }
                             .padding(.top, 8)
                             .padding(.trailing, 16)
+
+                            // Notes button just below counter
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showNotes.toggle()
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: showNotes ? "note.text.badge.plus" : "note.text")
+                                    Text("Notes")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(showNotes ? Color.orange : Color.black.opacity(0.5))
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                            }
+                            .padding(.trailing, 16)
                         }
                     }
                 }
@@ -453,6 +472,71 @@ struct SaveView: View {
                 }
 
                 Spacer()
+            }
+
+            // Notes overlay
+            if showNotes {
+                GeometryReader { geometry in
+                    ZStack {
+                        // Dim background — tap outside to close
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showNotes = false
+                                }
+                            }
+
+                        VStack(spacing: 0) {
+                            // Title bar
+                            HStack {
+                                Text("Notes — \(MainSaveFile.name)")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        showNotes = false
+                                    }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(Color(.secondarySystemBackground))
+
+                            Divider()
+
+                            // Text editor
+                            TextEditor(text: Binding(
+                                get: { MainSaveFile.notes ?? "" },
+                                set: { newValue in
+                                    MainSaveFile.notes = newValue
+                                    MainSaveFile.saveToDisk()
+                                }
+                            ))
+                            .font(.body)
+                            .padding(12)
+                            .background(Color(.systemBackground))
+                        }
+                        .frame(
+                            width: geometry.size.width * 0.9,
+                            height: geometry.size.height * 0.75
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 20)
+                        .position(
+                            x: geometry.size.width / 2,
+                            y: geometry.size.height / 2
+                        )
+                    }
+                }
+                .ignoresSafeArea()
+                .transition(.opacity)
+                .zIndex(10)
             }
 
             // Bottom bar
@@ -686,13 +770,12 @@ struct ShareSheet: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        controller.completionWithItemsHandler = { activityType, completed, _, error in
+        controller.completionWithItemsHandler = { _, completed, _, error in
             if error != nil {
                 context.coordinator.onComplete(false)
             } else if completed {
                 context.coordinator.onComplete(true)
             } else {
-                // completed = false, no error = user cancelled
                 context.coordinator.onComplete(false)
             }
         }
