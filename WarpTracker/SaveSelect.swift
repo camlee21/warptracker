@@ -22,61 +22,87 @@ struct SaveSelectView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(sortedSaves, id: \.name) { save in
-                        NavigationLink {
-                            SaveView(save: save, onDisappear: loadAllSaves)
-                        } label: {
-                            saveCard(save)
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                saveToDelete = save
-                                showDeleteConfirmation = true
+        ZStack {
+            GeometryReader { geo in
+                Image("splash_screen")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+            }
+            .ignoresSafeArea()
+
+            NavigationStack {
+                ZStack {
+                    Color.clear
+                        .ignoresSafeArea()
+
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(sortedSaves, id: \.name) { save in
+                                NavigationLink {
+                                    SaveView(save: save, onDisappear: loadAllSaves)
+                                } label: {
+                                    saveCard(save)
+                                }
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        saveToDelete = save
+                                        showDeleteConfirmation = true
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                            }
+
+                            Button {
+                                showNewSaveSheet = true
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                addCard()
                             }
                         }
+                        .padding(16)
                     }
-
-                    Button {
-                        showNewSaveSheet = true
-                    } label: {
-                        addCard()
+                    .scrollContentBackground(.hidden)
+                }
+                .navigationTitle("Warp Tracker")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .navigationDestination(item: $newSave) { save in
+                    SaveView(save: save, onDisappear: loadAllSaves)
+                }
+                .sheet(isPresented: $showNewSaveSheet) {
+                    newSaveSheet()
+                }
+                .confirmationDialog(
+                    "Delete \(saveToDelete?.name ?? "this save")?",
+                    isPresented: $showDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete", role: .destructive) {
+                        if let save = saveToDelete {
+                            deleteSave(save)
+                        }
                     }
-                }
-                .padding(16)
-            }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Warp Tracker")
-            .navigationBarTitleDisplayMode(.large)
-            .navigationDestination(item: $newSave) { save in
-                SaveView(save: save, onDisappear: loadAllSaves)
-            }
-            .sheet(isPresented: $showNewSaveSheet) {
-                newSaveSheet()
-            }
-            .confirmationDialog(
-                "Delete \(saveToDelete?.name ?? "this save")?",
-                isPresented: $showDeleteConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Delete", role: .destructive) {
-                    if let save = saveToDelete {
-                        deleteSave(save)
+                    Button("Cancel", role: .cancel) {
+                        saveToDelete = nil
                     }
+                } message: {
+                    Text("This cannot be undone.")
                 }
-                Button("Cancel", role: .cancel) {
-                    saveToDelete = nil
-                }
-            } message: {
-                Text("This cannot be undone.")
             }
-        }
-        .onAppear {
-            loadAllSaves()
+            .background(Color.clear)
+            .onAppear {
+                loadAllSaves()
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+                appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+                UINavigationBar.appearance().standardAppearance = appearance
+                UINavigationBar.appearance().scrollEdgeAppearance = appearance
+                UITableView.appearance().backgroundColor = .clear
+                UICollectionView.appearance().backgroundColor = .clear
+            }
         }
     }
 
@@ -191,7 +217,6 @@ struct SaveSelectView: View {
                 let name = url.deletingPathExtension().lastPathComponent
                 guard var loaded = Save.loadFromDisk(name: name) else { return nil }
 
-                // Rebuild graph from files so warp count is always current
                 var graph = WarpGraph()
                 graph.loadFromFiles()
                 for (id, savedWarp) in loaded.graph.warps {

@@ -52,7 +52,7 @@ struct SplashView: View {
                         .fill(Color.blue.opacity(0.15))
                         .frame(width: 120, height: 120)
 
-                    Image("save_background")
+                    Image("splash_screen")
                         .font(.system(size: 52))
                         .foregroundColor(.blue)
                 }
