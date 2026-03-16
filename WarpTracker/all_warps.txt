@@ -417,3 +417,5 @@ Victory_Road_Main_Cave, Victory Road
 Victory_Road_Water_Stairs_Top, Victory Road
 Victory_Road_Water_Stairs_Middle, Victory Road
 Victory_Road_Water_Stairs_Bottom, Victory Road
+Route_225_House, Route 225
+Route_225_Gate, Route 225

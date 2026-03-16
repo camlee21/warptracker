@@ -47,7 +47,7 @@ let imageSizes: [String: CGSize] = [
     "Route 206": CGSize(width: 434, height: 416),
     "Route 207": CGSize(width: 246, height: 215),
     "Route 208": CGSize(width: 412, height: 298),
-    "Route 223": CGSize(width: 0, height: 0),
+    "Route 225": CGSize(width: 320, height: 173),
     "Route 226": CGSize(width: 274, height: 180),
     "Route 227": CGSize(width: 146, height: 139),
     "Stark Mountain": CGSize(width: 300, height: 245),
@@ -61,7 +61,7 @@ let imageSizes: [String: CGSize] = [
     "Acuity Lakefront": CGSize(width: 245, height: 193),
     "Verity Lakefront": CGSize(width: 270, height: 154),
     "Mt Coronet": CGSize(width: 903, height: 800),
-    "Coronet Peak": CGSize(width: 599, height: 711),
+    "Mt Coronet Peak": CGSize(width: 599, height: 711),
     "Pokemon League": CGSize(width: 840, height: 328),
     "Victory Road": CGSize(width: 1000, height: 766),
     "Fight Area": CGSize(width: 611, height: 428),
@@ -564,6 +564,10 @@ let warpPoints: [String: [WarpPoint]] = [
     "Route 226": [
         WarpPoint(warpID: "Route_226_House", xPercent: 0.26, yPercent: 0.54),
         WarpPoint(warpID: "Route_226_Gate", xPercent: 0.85, yPercent: 0.63),
+    ],
+    "Route 225": [
+        WarpPoint(warpID: "Route_225_House", xPercent: 0.22, yPercent: 0.64),
+        WarpPoint(warpID: "Route_225_Gate", xPercent: 0.76, yPercent: 0.63),
     ],
     "Route 205": [
         WarpPoint(warpID: "Eterna_Forest_Entrance", xPercent: 0.25, yPercent: 0.34),

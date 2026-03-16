@@ -103,6 +103,7 @@ struct MapView: View {
         case "Route 207": return "route_207"
         case "Route 208": return "route_208"
         case "Route 223": return "route_223"
+        case "Route 225": return "route_225"
         case "Route 226": return "route_226"
         case "Route 227": return "route_227"
         case "Stark Mountain": return "stark_mountain"

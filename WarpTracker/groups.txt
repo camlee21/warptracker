@@ -434,6 +434,8 @@ Survival_Area_Battleground
 Survival_Area_Centre_Exit
 Survival_Area_Centre_Left
 Survival_Area_Centre_Right
+Route_225_House
+Route_225_Gate
 -- Iron Island First Room --
 Iron_Island_Room_1_Exit
 Iron_Island_Room_1_Left

@@ -189,7 +189,18 @@ struct SaveSelectView: View {
             let files = try FileManager.default.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil)
             saves = files.filter { $0.pathExtension == "plist" }.compactMap { url in
                 let name = url.deletingPathExtension().lastPathComponent
-                return Save.loadFromDisk(name: name)
+                guard var loaded = Save.loadFromDisk(name: name) else { return nil }
+
+                // Rebuild graph from files so warp count is always current
+                var graph = WarpGraph()
+                graph.loadFromFiles()
+                for (id, savedWarp) in loaded.graph.warps {
+                    if let linkedID = savedWarp.linked {
+                        graph.warps[id]?.linked = linkedID
+                    }
+                }
+                loaded.graph = graph
+                return loaded
             }
         } catch {
             print("Failed to list saves: \(error)")
