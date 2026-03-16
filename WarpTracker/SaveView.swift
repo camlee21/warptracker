@@ -6,6 +6,75 @@ import UniformTypeIdentifiers
 let topBarIcons = ["dead_end", "event", "trainer", "bike", "HM", "level", "legendary"]
 let trainerIcons = ["Roark", "Gardenia", "Fantina", "Maylene", "Crasher Wake", "Byron", "Candice", "Volkner", "Aaron", "Bertha", "Flint", "Lucian", "Cynthia"]
 
+// →
+
+let adjacencies: [String: [(direction: String, location: String)]] = [
+    "Sandgem": [("←", "Verity Lakefront"), ("↑", "Jubilife"), ("↓", "Route 221")],
+    "Jubilife": [("↓", "Sandgem"), ("↑", "Route 204"), ("→", "Route 203")],
+    "Verity Lakefront": [("→", "Sandgem")],
+    "Jubilife GTS": [("→", "Sandgem")],
+    "Route 204": [("→", "Sandgem")],
+    "Route 203": [("→", "Sandgem")],
+    "Oreburgh": [("→", "Sandgem")],
+    "Oreburgh Gate": [("→", "Sandgem")],
+    "Floaroma": [("→", "Sandgem")],
+    "Floaroma Meadow": [("→", "Sandgem")],
+    "Eterna": [("→", "Sandgem")],
+    "Eterna Forest": [("→", "Sandgem")],
+    "Hearthome": [("→", "Sandgem")],
+    "Solaceon": [("→", "Sandgem")],
+    "Solaceon Ruins": [("→", "Sandgem")],
+    "Veilstone": [("→", "Sandgem")],
+    "Dept Store": [("→", "Sandgem")],
+    "Pastoria": [("→", "Sandgem")],
+    "Celestic": [("→", "Sandgem")],
+    "Canalave": [("→", "Sandgem")],
+    "Iron Island": [("→", "Sandgem")],
+    "Snowpoint": [("→", "Sandgem")],
+    "Sunyshore": [("→", "Sandgem")],
+    "Valor Lakefront": [("→", "Sandgem")],
+    "Route 209": [("→", "Sandgem")],
+    "Route 210": [("→", "Sandgem")],
+    "Route 211": [("→", "Sandgem")],
+    "Route 212": [("→", "Sandgem")],
+    "Route 213": [("→", "Sandgem")],
+    "Route 214": [("→", "Sandgem")],
+    "Route 215": [("→", "Sandgem")],
+    "Route 216": [("→", "Sandgem")],
+    "Route 217": [("→", "Sandgem")],
+    "Route 221": [("→", "Sandgem")],
+    "Route 222": [("→", "Sandgem")],
+    "Route 205": [("→", "Sandgem")],
+    "Route 206": [("→", "Sandgem")],
+    "Route 207": [("→", "Sandgem")],
+    "Route 208": [("→", "Sandgem")],
+    "Route 223": [("→", "Sandgem")],
+    "Route 226": [("→", "Sandgem")],
+    "Route 227": [("→", "Sandgem")],
+    "Stark Mountain": [("→", "Sandgem")],
+    "Route 228": [("→", "Sandgem")],
+    "Backlot Mansion": [("→", "Sandgem")],
+    "Jubilife TV": [("→", "Sandgem")],
+    "Poketch": [("→", "Sandgem")],
+    "TG Eterna": [("→", "Sandgem")],
+    "Old Chateau": [("→", "Sandgem")],
+    "Galactic HQ": [("→", "Sandgem")],
+    "Acuity Lakefront": [("→", "Sandgem")],
+    "Mt Coronet": [("→", "Sandgem")],
+    "Coronet Peak": [("→", "Sandgem")],
+    "Pokemon League": [("→", "Sandgem")],
+    "Victory Road": [("→", "Sandgem")],
+    "Fight Area": [("→", "Sandgem")],
+    "Survival Area": [("→", "Sandgem")],
+    "Resort Area": [("→", "Sandgem")],
+    "Fuego Ironworks": [("→", "Sandgem")],
+    "Lake Verity": [("→", "Sandgem")],
+    "Lake Valor": [("→", "Sandgem")],
+    "Lake Acuity": [("→", "Sandgem")],
+    "Pokemon League Outside": [("→", "Sandgem")],
+    "Valley Windworks": [("→", "Sandgem")],
+]
+
 struct SaveView: View {
     @State var PlatinumWarpGraph: WarpGraph
     @State var MainSaveFile: Save
@@ -235,6 +304,37 @@ struct SaveView: View {
     func iconRows(from icons: [String]) -> [[String]] {
         stride(from: 0, to: icons.count, by: 5).map {
             Array(icons[$0..<min($0 + 5, icons.count)])
+        }
+    }
+    
+    @ViewBuilder
+    func adjacencyBar() -> some View {
+        if let location = selectedLocation,
+           let neighbors = adjacencies[location],
+           !neighbors.isEmpty {
+            HStack(spacing: 10) {
+                ForEach(neighbors, id: \.location) { neighbor in
+                    Button {
+                        selectedLocation = neighbor.location
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(neighbor.direction)
+                                .font(.caption)
+                                .fontWeight(.bold)
+                            Text(neighbor.location)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.black.opacity(0.5))
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
         }
     }
 
@@ -543,6 +643,8 @@ struct SaveView: View {
             VStack {
                 Spacer()
 
+                adjacencyBar()
+                
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 8) {
                         if showFlags {
