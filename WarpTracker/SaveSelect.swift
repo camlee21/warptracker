@@ -8,16 +8,19 @@
 import SwiftUI
 
 let availableGames: [String] = [
-    "Pokémon Platinum"
+    "Pokémon Platinum",
+    "Pokémon Emerald",
+    "Pokémon FRLG",
+    "Pokémon BW2",
+    "Pokémon HGSS"
 ]
 
 let gameBackgrounds: [String: String] = [
     "Pokémon Platinum": "platinum_background",
     "Pokémon Emerald": "emerald_background",
-    "Pokémon Black 2": "blackwhite_background",
-    "Pokémon White 2": "blackwhite_background",
-    "Pokémon HeartGold": "heartgold_background",
-    "Pokémon SoulSilver": "soulsilver_background",
+    "Pokémon BW2": "blackwhite_background",
+    "Pokémon HGSS": "hgss_background",
+    "Pokémon FRLG": "frlg_background"
 ]
 
 struct SaveSelectView: View {
@@ -28,11 +31,16 @@ struct SaveSelectView: View {
     @State var saveToDelete: Save? = nil
     @State var showDeleteConfirmation: Bool = false
     @State var newSave: Save? = nil
+    @State var showDuplicateWarning: Bool = false
 
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var sortedSaves: [Save] {
         saves.sorted { $0.name < $1.name }
+    }
+
+    var nameAlreadyExists: Bool {
+        saves.contains { $0.name.lowercased() == newSaveName.trimmingCharacters(in: .whitespaces).lowercased() }
     }
 
     var body: some View {
@@ -104,6 +112,26 @@ struct SaveSelectView: View {
                 } message: {
                     Text("This cannot be undone.")
                 }
+                .confirmationDialog(
+                    "Replace \"\(newSaveName.trimmingCharacters(in: .whitespaces))\"?",
+                    isPresented: $showDuplicateWarning,
+                    titleVisibility: .visible
+                ) {
+                    Button("Replace", role: .destructive) {
+                        let trimmed = newSaveName.trimmingCharacters(in: .whitespaces)
+                        if let existing = saves.first(where: { $0.name.lowercased() == trimmed.lowercased() }) {
+                            deleteSave(existing)
+                        }
+                        let save = createNewSave(name: trimmed, game: newSaveGame)
+                        newSaveName = ""
+                        newSaveGame = "Pokémon Platinum"
+                        showNewSaveSheet = false
+                        newSave = save
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("A save with this name already exists. Replacing it will permanently delete the existing save.")
+                }
             }
             .background(Color.clear)
             .onAppear {
@@ -131,15 +159,13 @@ struct SaveSelectView: View {
 
         GeometryReader { geo in
             ZStack(alignment: .bottomLeading) {
-                // Game background image
                 Image(backgroundImage)
                     .resizable()
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.width / 1.5)
                     .clipped()
-                    .opacity(0.7) // CHANGE OPACITY HERE :)
+                    .opacity(0.7)
 
-                // Text overlay
                 VStack(alignment: .leading, spacing: 4) {
                     Text(save.name)
                         .font(.headline)
@@ -212,9 +238,23 @@ struct SaveSelectView: View {
             }
             .padding(.top, 8)
 
-            TextField("Save name", text: $newSaveName)
-                .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
+            VStack(alignment: .leading, spacing: 6) {
+                TextField("Save name", text: $newSaveName)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal)
+
+                if nameAlreadyExists {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                        Text("A save with this name already exists.")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                    .padding(.horizontal, 20)
+                }
+            }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Game")
@@ -256,11 +296,16 @@ struct SaveSelectView: View {
                 .cornerRadius(10)
 
                 Button("Create") {
-                    let save = createNewSave(name: newSaveName, game: newSaveGame)
-                    newSaveName = ""
-                    newSaveGame = "Pokémon Platinum"
-                    showNewSaveSheet = false
-                    newSave = save
+                    let trimmed = newSaveName.trimmingCharacters(in: .whitespaces)
+                    if nameAlreadyExists {
+                        showDuplicateWarning = true
+                    } else {
+                        let save = createNewSave(name: trimmed, game: newSaveGame)
+                        newSaveName = ""
+                        newSaveGame = "Pokémon Platinum"
+                        showNewSaveSheet = false
+                        newSave = save
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -274,7 +319,7 @@ struct SaveSelectView: View {
             Spacer()
         }
         .padding(.top, 32)
-        .presentationDetents([.height(320)])
+        .presentationDetents([.height(340)])
     }
 
     func loadAllSaves() {
