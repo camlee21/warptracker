@@ -7,10 +7,15 @@
 
 import SwiftUI
 
+let availableGames: [String] = [
+    "Pokémon Platinum"
+]
+
 struct SaveSelectView: View {
     @State var saves: [Save] = []
     @State var showNewSaveSheet: Bool = false
     @State var newSaveName: String = ""
+    @State var newSaveGame: String = "Pokémon Platinum"
     @State var saveToDelete: Save? = nil
     @State var showDeleteConfirmation: Bool = false
     @State var newSave: Save? = nil
@@ -120,7 +125,7 @@ struct SaveSelectView: View {
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
 
-            Text("Pokémon Platinum")
+            Text(save.game ?? "Pokémon Platinum")
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
@@ -167,19 +172,46 @@ struct SaveSelectView: View {
                 Text("New Save")
                     .font(.title2)
                     .fontWeight(.bold)
-                Text("Pokémon Platinum")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
             }
             .padding(.top, 8)
 
+            // Save name
             TextField("Save name", text: $newSaveName)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
+            // Game picker
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Game")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(availableGames, id: \.self) { game in
+                            Button {
+                                newSaveGame = game
+                            } label: {
+                                Text(game)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(newSaveGame == game ? Color.blue : Color(.systemGray5))
+                                    .foregroundColor(newSaveGame == game ? .white : .primary)
+                                    .cornerRadius(20)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+
             HStack(spacing: 12) {
                 Button("Cancel") {
                     newSaveName = ""
+                    newSaveGame = "Pokémon Platinum"
                     showNewSaveSheet = false
                 }
                 .frame(maxWidth: .infinity)
@@ -189,8 +221,9 @@ struct SaveSelectView: View {
                 .cornerRadius(10)
 
                 Button("Create") {
-                    let save = createNewSave(name: newSaveName)
+                    let save = createNewSave(name: newSaveName, game: newSaveGame)
                     newSaveName = ""
+                    newSaveGame = "Pokémon Platinum"
                     showNewSaveSheet = false
                     newSave = save
                 }
@@ -206,7 +239,7 @@ struct SaveSelectView: View {
             Spacer()
         }
         .padding(.top, 32)
-        .presentationDetents([.height(280)])
+        .presentationDetents([.height(320)])
     }
 
     func loadAllSaves() {
@@ -233,10 +266,11 @@ struct SaveSelectView: View {
     }
 
     @discardableResult
-    func createNewSave(name: String) -> Save {
+    func createNewSave(name: String, game: String) -> Save {
         var graph = WarpGraph()
         graph.loadFromFiles()
         var save = Save(name: name, date: Date(), graph: graph)
+        save.game = game
         save.saveToDisk()
         saves.append(save)
         return save

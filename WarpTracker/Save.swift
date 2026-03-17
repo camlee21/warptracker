@@ -65,6 +65,7 @@ struct Save: Codable, Hashable {
     var traversalFlags: [String: Bool]
     var available: [String]
     var notes: String?
+    var game: String?
 
     init(name: String, date: Date, graph: WarpGraph) {
         self.name = name

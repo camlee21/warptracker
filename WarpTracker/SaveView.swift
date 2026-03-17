@@ -719,6 +719,7 @@ struct SaveView: View {
         }
         .navigationTitle(MainSaveFile.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .onDisappear {
             onDisappear()
         }

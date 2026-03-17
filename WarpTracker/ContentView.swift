@@ -12,7 +12,17 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            SaveSelectView()
+            TabView {
+                SaveSelectView()
+                    .tabItem {
+                        Label("Saves", systemImage: "square.stack.fill")
+                    }
+
+                ResourcesView()
+                    .tabItem {
+                        Label("Resources", systemImage: "book.fill")
+                    }
+            }
 
             if showSplash {
                 SplashView()
