@@ -11,6 +11,15 @@ let availableGames: [String] = [
     "Pokémon Platinum"
 ]
 
+let gameBackgrounds: [String: String] = [
+    "Pokémon Platinum": "platinum_background",
+    "Pokémon Emerald": "emerald_background",
+    "Pokémon Black 2": "blackwhite_background",
+    "Pokémon White 2": "blackwhite_background",
+    "Pokémon HeartGold": "heartgold_background",
+    "Pokémon SoulSilver": "soulsilver_background",
+]
+
 struct SaveSelectView: View {
     @State var saves: [Save] = []
     @State var showNewSaveSheet: Bool = false
@@ -116,50 +125,78 @@ struct SaveSelectView: View {
         let cynthiaDefeated = save.flags["DEFEATED_CYNTHIA"] == .done
         let linked = save.graph.warps.values.filter { $0.linked != nil }.count
         let total = save.graph.warps.count
+        let gameName = save.game ?? "Pokémon Platinum"
+        let backgroundImage = gameBackgrounds[gameName] ?? "platinum_background"
+        let gold = Color(red: 0.9882352941, green: 0.7607843137, blue: 0)
 
-        VStack(alignment: .leading, spacing: 6) {
-            Text(save.name)
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundColor(cynthiaDefeated ? .green : .primary)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
+        GeometryReader { geo in
+            ZStack(alignment: .bottomLeading) {
+                // Game background image
+                Image(backgroundImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.width / 1.5)
+                    .clipped()
+                    .opacity(0.7) // CHANGE OPACITY HERE :)
 
-            Text(save.game ?? "Pokémon Platinum")
-                .font(.caption2)
-                .foregroundColor(.secondary)
+                // Text overlay
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(save.name)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(cynthiaDefeated ? gold : .white)
+                        .lineLimit(2)
+                        .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
 
-            Text("\(linked) / \(total) linked")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                    Text(gameName)
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.85))
+                        .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+
+                    Text("\(linked) / \(total) linked")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.75))
+                        .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                }
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.6), Color.clear],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                )
+            }
+            .frame(width: geo.size.width, height: geo.size.width / 1.5)
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .aspectRatio(1.5, contentMode: .fit)
     }
 
     @ViewBuilder
     func addCard() -> some View {
-        VStack(spacing: 10) {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 32))
-                .foregroundColor(.blue)
-            Text("New Save")
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.blue)
+        GeometryReader { geo in
+            VStack(spacing: 10) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(.blue)
+                Text("New Save")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.blue)
+            }
+            .frame(width: geo.size.width, height: geo.size.width / 1.5)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.blue.opacity(0.4), style: StrokeStyle(lineWidth: 2, dash: [6]))
+            )
+            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 90)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.blue.opacity(0.4), style: StrokeStyle(lineWidth: 2, dash: [6]))
-        )
-        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .aspectRatio(1.5, contentMode: .fit)
     }
 
     @ViewBuilder
@@ -175,12 +212,10 @@ struct SaveSelectView: View {
             }
             .padding(.top, 8)
 
-            // Save name
             TextField("Save name", text: $newSaveName)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
-            // Game picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Game")
                     .font(.caption)
