@@ -15,6 +15,10 @@ let availableGames: [String] = [
     "Pokémon HGSS"
 ]
 
+let unlockedGames: Set<String> = [
+    "Pokémon Platinum"
+]
+
 let gameBackgrounds: [String: String] = [
     "Pokémon Platinum": "platinum_background",
     "Pokémon Emerald": "emerald_background",
@@ -265,18 +269,45 @@ struct SaveSelectView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         ForEach(availableGames, id: \.self) { game in
+                            let isUnlocked = unlockedGames.contains(game)
+                            let isSelected = newSaveGame == game
+
                             Button {
-                                newSaveGame = game
+                                if isUnlocked {
+                                    newSaveGame = game
+                                }
                             } label: {
-                                Text(game)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
-                                    .background(newSaveGame == game ? Color.blue : Color(.systemGray5))
-                                    .foregroundColor(newSaveGame == game ? .white : .primary)
-                                    .cornerRadius(20)
+                                HStack(spacing: 5) {
+                                    if !isUnlocked {
+                                        Image(systemName: "lock.fill")
+                                            .font(.caption2)
+                                    }
+                                    Text(game)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(
+                                    isUnlocked
+                                        ? (isSelected ? Color.blue : Color(.systemGray5))
+                                        : Color(.systemGray5).opacity(0.5)
+                                )
+                                .foregroundColor(
+                                    isUnlocked
+                                        ? (isSelected ? .white : .primary)
+                                        : Color(.systemGray3)
+                                )
+                                .cornerRadius(20)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(
+                                            isUnlocked ? Color.clear : Color(.systemGray4),
+                                            lineWidth: 1
+                                        )
+                                )
                             }
+                            .disabled(!isUnlocked)
                         }
                     }
                     .padding(.horizontal)

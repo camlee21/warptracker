@@ -161,7 +161,7 @@ extension WarpGraph {
     mutating func loadFromFiles() {
         
         // Reading in and adding all warps
-        if let warpsURL = Bundle.main.url(forResource: "all_warps", withExtension: "txt"),
+        if let warpsURL = Bundle.main.url(forResource: "platinum_all_warps", withExtension: "txt"),
            let warpsContent = try? String(contentsOf: warpsURL) {
             let lines = warpsContent.components(separatedBy: .newlines).filter { !$0.isEmpty }
             for line in lines {
@@ -173,7 +173,7 @@ extension WarpGraph {
         }
         
         // Linking all grouped warps
-        if let groupsURL = Bundle.main.url(forResource: "groups", withExtension: "txt"),
+        if let groupsURL = Bundle.main.url(forResource: "platinum_groups", withExtension: "txt"),
            let groupsContent = try? String(contentsOf: groupsURL) {
             let lines = groupsContent.components(separatedBy: .newlines)
             var items: [String] = []
@@ -193,20 +193,8 @@ extension WarpGraph {
             }
         }
         
-        // Reading in and linking all double links
-//        if let doubleLinksURL = Bundle.main.url(forResource: "all_double_links", withExtension: "txt"),
-//           let doubleLinksContent = try? String(contentsOf: doubleLinksURL) {
-//            let lines = doubleLinksContent.components(separatedBy: .newlines).filter { !$0.isEmpty }
-//            for line in lines {
-//                let parts = line.components(separatedBy: ", ")
-//                if parts.count >= 2 {
-//                    addDoubleLink(between: parts[0], and: parts[1])
-//                }
-//            }
-//        }
-        
         // Reading in and linking all single links
-        if let singleLinksURL = Bundle.main.url(forResource: "all_single_links", withExtension: "txt"),
+        if let singleLinksURL = Bundle.main.url(forResource: "platinum_all_single_links", withExtension: "txt"),
            let singleLinksContent = try? String(contentsOf: singleLinksURL) {
             let lines = singleLinksContent.components(separatedBy: .newlines).filter { !$0.isEmpty }
             for line in lines {
