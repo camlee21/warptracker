@@ -20,6 +20,7 @@ let adjacencies: [String: [(direction: String, location: String)]] = [
     "Solaceon": [("↓", "Route 209"), ("↑", "Route 210")],
     "Pastoria": [("←", "Route 212")],
     "Celestic": [("←", "Route 211"), ("→", "Route 210")],
+    "Canalave": [("→", "Iron Island")],
     "Iron Island": [("←", "Canalave")],
     "Snowpoint": [("←", "Route 217")],
     "Sunyshore": [("↑", "Pokemon League")],
@@ -474,36 +475,20 @@ struct SaveView: View {
 
                         } else {
                             // Counter
-                            ZStack(alignment: .bottomTrailing) {
-                                Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(20)
-                                    .onLongPressGesture(minimumDuration: 0.4) {
-                                        showCounterTooltip = true
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                            showCounterTooltip = false
-                                        }
+                            Text("\(unlinkedAvailableCount) / \(MainSaveFile.available.count) / \(MainSaveFile.graph.warps.count)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                                .onLongPressGesture(minimumDuration: 0.4) {
+                                    showCounterTooltip = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                        showCounterTooltip = false
                                     }
-
-                                if showCounterTooltip {
-                                    Text("Unlinked / Available / Total Warps")
-                                        .font(.caption2)
-                                        .fontWeight(.medium)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(Color.black.opacity(0.75))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(10)
-                                        .offset(y: 30)
-                                        .transition(.opacity)
-                                        .animation(.easeInOut(duration: 0.2), value: showCounterTooltip)
                                 }
-                            }
                             .padding(.top, 8)
                             .padding(.trailing, 16)
 
@@ -526,6 +511,21 @@ struct SaveView: View {
                                 .cornerRadius(20)
                             }
                             .padding(.trailing, 16)
+
+                            // Tooltip shown below the Notes button
+                            if showCounterTooltip {
+                                Text("Unlinked / Available / Total Warps")
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.black.opacity(0.75))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                                    .padding(.trailing, 16)
+                                    .transition(.opacity)
+                                    .animation(.easeInOut(duration: 0.2), value: showCounterTooltip)
+                            }
                         }
                     }
                 }
@@ -618,6 +618,21 @@ struct SaveView: View {
             // Bottom bar
             VStack {
                 Spacer()
+
+                // Current location label
+                if let location = selectedLocation {
+                    Text(location)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Color.black.opacity(0.55))
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
+                }
+                
+                Spacer()
+                    .frame(height: 5)
 
                 adjacencyBar()
                 
