@@ -20,13 +20,13 @@ let resourcesByGame: [String: [Resource]] = [
     "All": [
         Resource(
             title: "Warp Randomizer Info",
-            description: "The main page for the Pokemon Warp Randomizer by Pointcrow.",
+            description: "The main page for the Pokemon Warp Randomizer by Pointcrow",
             url: "https://warprandomizer.com/",
             icon: "shuffle"
         ),
         Resource(
             title: "Rare Candies",
-            description: "The location of all Rare Candies in different Pokemon games.",
+            description: "The location of all Rare Candies in different Pokemon games",
             url: "https://bulbapedia.bulbagarden.net/wiki/Rare_Candy#Acquisition",
             icon: "book.fill"
         ),
@@ -40,7 +40,7 @@ let resourcesByGame: [String: [Resource]] = [
         ),
         Resource(
             title: "Gym and E4 Battles",
-            description: "Information on each Gym Leader and E4 + Champion battle in Pokemon Platinum.",
+            description: "Information on each Gym Leader and E4 + Champion battle in Pokemon Platinum",
             url: "https://pokemondb.net/platinum/gymleaders-elitefour",
             icon: "globe"
         ),

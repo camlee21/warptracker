@@ -371,9 +371,6 @@ Coronet_Cyrus_Exit_Right
 -- Mt Coronet Looker Room --
 Coronet_Looker_Room_Exit_East
 Coronet_Looker_Room_Exit_North
--- Mt Coronet Big Room --
-Coronet_Big_Room_East
-Coronet_Big_Room_North
 -- Coronet Stairs and Exit Room --
 Coronet_Stairs_Left
 Coronet_Stairs_Right

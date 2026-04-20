@@ -441,7 +441,7 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Poketch_Company_Stairs", xPercent: 0.32, yPercent: 0.34),
     ],
     "TG Eterna": [
-        WarpPoint(warpID: "TG_Eterna_1F_Exit", xPercent: 0.23, yPercent: 0.82),
+        WarpPoint(warpID: "TG_Eterna_1F_Exit", xPercent: 0.23, yPercent: 0.90),
         WarpPoint(warpID: "TG_Eterna_1F_Rotom_Room", xPercent: 0.04, yPercent: 0.59),
         WarpPoint(warpID: "TG_Eterna_1F_Stairs_Left", xPercent: 0.30, yPercent: 0.65),
         WarpPoint(warpID: "TG_Eterna_1F_Stairs_Right", xPercent: 0.44, yPercent: 0.65),
@@ -487,8 +487,8 @@ let warpPoints: [String: [WarpPoint]] = [
         WarpPoint(warpID: "Acuity_Lake_Entrance", xPercent: 0.34, yPercent: 0.61),
     ],
     "Lake Acuity": [
-        WarpPoint(warpID: "Aquity_Lake_Exit", xPercent: 0.10, yPercent: 0.97),
-        WarpPoint(warpID: "Aquity_Lake_Cave", xPercent: 0.47, yPercent: 0.64),
+        WarpPoint(warpID: "Acuity_Lake_Exit", xPercent: 0.10, yPercent: 0.97),
+        WarpPoint(warpID: "Acuity_Lake_Cave", xPercent: 0.47, yPercent: 0.64),
     ],
     "Verity Lakefront": [
         WarpPoint(warpID: "Verity_Lake_Entrance", xPercent: 0.46, yPercent: 0.45),
